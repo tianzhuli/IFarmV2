@@ -72,11 +72,17 @@ public abstract class BaseDao<T> {
 				}
 			} catch (IllegalArgumentException | IllegalAccessException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.error("criteria add error", e);
 			}
 		}
-		Criteria crit = criteria.getExecutableCriteria(session);
-		List<T> list = crit.list();
+		List<T> list = null;
+		try {
+			Criteria crit = criteria.getExecutableCriteria(session);
+			list = crit.list();
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.error("criteria list error", e);
+		}
 		return list;
 	}
 
@@ -131,9 +137,10 @@ public abstract class BaseDao<T> {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * 通过主键来删除
+	 * 
 	 * @param t
 	 */
 	public void deleteBase(T t) {

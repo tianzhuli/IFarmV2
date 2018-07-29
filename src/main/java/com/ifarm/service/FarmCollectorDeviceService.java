@@ -79,19 +79,6 @@ public class FarmCollectorDeviceService {
 		try {
 			farmCollectorDeviceDao.saveFarmCollectorDevice(fDevice);
 			farmCollectorRedisHelper.setFarmCollectorCache(collectorId, deviceId);
-			/*
-			 * if (CacheDataBase.collectorDeviceAddCache.containsKey(fDevice.
-			 * getCollectorId())) {
-			 * CacheDataBase.collectorDeviceAddCache.get(fDevice
-			 * .getCollectorId()).add(fDevice.getDeviceId()); } else {
-			 * List<Long> list = new ArrayList<Long>();
-			 * list.add(fDevice.getDeviceId());
-			 * CacheDataBase.collectorDeviceAddCache
-			 * .put(fDevice.getCollectorId(), list); }
-			 */
-			// 将添加的设备加入到缓存,等待集中器通信时添加到集中器
-			// CacheDataBase.collectorDeviceDetail.put(deviceId,
-			// JsonObjectUtil.fromBean(fDevice));
 			return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.SUCCESS);
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -146,5 +133,9 @@ public class FarmCollectorDeviceService {
 			farmCollectorDevice_log.error(JSON.toJSONString(farmCollectorDevice) + "-delete error", e);
 			return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.ERROR);
 		}
+	}
+	
+	public String queryFarmCollectorDevices(FarmCollectorDevice farmCollectorDevice) {
+		return JsonObjectUtil.toJsonArrayString(farmCollectorDeviceDao.getDynamicList(farmCollectorDevice));
 	}
 }

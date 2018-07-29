@@ -7,19 +7,24 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.ifarm.annotation.TransientField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ifarm.annotation.TransientField;
 
 public class JsonObjectUtil {
 	private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private static final Logger LOGGER = LoggerFactory.getLogger(JsonObjectUtil.class);
 
 	public static JSONObject toJsonObjectString(Object object) {
-		if (object == null) {
-			return null;
-		}
 		JSONObject jsonObject = new JSONObject();
+		if (object == null) {
+			Exception exception = new Exception();
+			LOGGER.error("null error", exception);
+			return jsonObject;
+		}
 		Field[] fields = object.getClass().getDeclaredFields();
 		for (int i = 0; i < fields.length; i++) {
 			fields[i].setAccessible(true);
@@ -28,7 +33,7 @@ public class JsonObjectUtil {
 					if (fields[i].get(object) instanceof Date) {
 						Date date = (Date) fields[i].get(object);
 						jsonObject.put(fields[i].getName(), FORMAT.format(date));
-					}else {
+					} else {
 						jsonObject.put(fields[i].getName(), fields[i].get(object).toString());
 					}
 				}
@@ -42,6 +47,11 @@ public class JsonObjectUtil {
 
 	public static <T> String toJsonArrayString(List<T> list) {
 		JSONArray jsonArray = new JSONArray();
+		if (list != null && list.size() == 0) {
+			Exception exception = new Exception();
+			LOGGER.error("array error", exception);
+			return jsonArray.toJSONString();
+		}
 		for (int i = 0; i < list.size(); i++) {
 			Object object = list.get(i);
 			JSONArray array = new JSONArray();
@@ -60,6 +70,11 @@ public class JsonObjectUtil {
 
 	public static <T> String toJsonArray(LinkedBlockingQueue<T> list) {
 		JSONArray jsonArray = new JSONArray();
+		if (list != null && list.size() == 0) {
+			Exception exception = new Exception();
+			LOGGER.error("array error", exception);
+			return jsonArray.toJSONString();
+		}
 		Iterator<T> iterator = list.iterator();
 		while (iterator.hasNext()) {
 			jsonArray.add(toJsonObjectString(iterator.next()));
@@ -94,6 +109,7 @@ public class JsonObjectUtil {
 
 	/**
 	 * 不转成string
+	 * 
 	 * @param object
 	 * @return
 	 */

@@ -30,7 +30,8 @@ public class FarmControlDeviceService {
 		}
 		try {
 			farmControlDeviceDao.saveFarmCollectorDevice(farmControlDevice);
-			//CacheDataBase.controlDeviceDetailMap.put(deviceId, JsonObjectUtil.fromBean(farmControlDevice));
+			// CacheDataBase.controlDeviceDetailMap.put(deviceId,
+			// JsonObjectUtil.fromBean(farmControlDevice));
 			return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.SUCCESS);
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -43,7 +44,7 @@ public class FarmControlDeviceService {
 	public String farmControlDeviceList(FarmControlDevice farmControlDevice) {
 		return JsonObjectUtil.toJsonArrayString(farmControlDeviceDao.getDynamicList(farmControlDevice));
 	}
-	
+
 	public String deleteFarmControlDevice(FarmControlDevice farmControlDevice) {
 		try {
 			farmControlDeviceDao.deleteBase(farmControlDevice);
@@ -53,5 +54,9 @@ public class FarmControlDeviceService {
 			farmControlDevice_log.error(JSON.toJSONString(farmControlDevice) + "-delete error", e);
 			return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.ERROR);
 		}
+	}
+
+	public String queryFarmControlDevices(FarmControlDevice farmControlDevice) {
+		return JsonObjectUtil.toJsonArrayString(farmControlDeviceDao.getDynamicList(farmControlDevice));
 	}
 }

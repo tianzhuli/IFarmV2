@@ -58,13 +58,23 @@ public class DeviceController {
 	String collectorDeviceAddition(FarmCollectorDevice farmCollectorDevice) {
 		return farmCollectorDeviceService.saveCollectorDevice(farmCollectorDevice);
 	}
-	
+
 	@RequestMapping("collectorDevice/delete")
+	String collectorDeviceQuery(FarmCollectorDevice farmCollectorDevice) {
+		return farmCollectorDeviceService.queryFarmCollectorDevices(farmCollectorDevice);
+	}
+
+	@RequestMapping("controlDevice/delete")
+	String controlDeviceQuery(FarmControlDevice farmControlDevice) {
+		return farmControlDeviceService.queryFarmControlDevices(farmControlDevice);
+	}
+
+	@RequestMapping("collectorDevice/query")
 	String collectorDeviceDelet(FarmCollectorDevice farmCollectorDevice) {
 		return farmCollectorDeviceService.deleteFarmCollectorDevice(farmCollectorDevice);
 	}
 
-	@RequestMapping("controlDevice/delete")
+	@RequestMapping("controlDevice/query")
 	String controlDeviceDelete(FarmControlDevice farmControlDevice) {
 		return farmControlDeviceService.deleteFarmControlDevice(farmControlDevice);
 	}

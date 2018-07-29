@@ -39,6 +39,7 @@
 			<mvc:mapping path="/device/collectorDevice" />
 			<mvc:mapping path="/device/controlDevice" />
 			<mvc:mapping path="/farmControlSystem/**/addition" />
+			<mvc:mapping path="/farmControlSystem/**/delete" />
 			<bean class="com.ifarm.interceptor.ManagerInterceptor"></bean>
 		</mvc:interceptor>
 		<!-- 当设置多个拦截器时，先按顺序调用preHandle方法，然后逆序调用每个拦截器的postHandle和afterCompletion方法 -->
