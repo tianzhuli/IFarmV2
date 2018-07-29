@@ -1,0 +1,5 @@
+com\ifarm\test\ControlTest.class
+com\ifarm\test\FarmTest.class
+com\ifarm\test\ManagerTest.class
+com\ifarm\test\SensorTest.class
+com\ifarm\test\UserTest.class

@@ -1,0 +1,47 @@
+{
+	"controlSystemType": [{
+		"systemCode": "vavleControl",
+		"systemType": "vavle",
+		"systemTypeCode": "阀门控制系统"
+	}, {
+		"systemCode": "carbonDioxideControl",
+		"systemType": "carbonDioxide",
+		"systemTypeCode": "二氧化碳控制系统"
+	}, {
+		"systemCode": "sideRollerShuttersControl",
+		"systemType": "rollerShutters",
+		"systemTypeCode": "侧卷帘系统"
+	}, {
+		"systemCode": "waterRollerShuttersControl",
+		"systemType": "waterRollerShutters",
+		"systemTypeCode": "水帘控制系统"
+	}, {
+		"systemCode": "humidityControl",
+		"systemType": "humidity",
+		"systemTypeCode": "湿度控制系统"
+	}, {
+		"systemCode": "oxygenControl",
+		"systemType": "oxygen",
+		"systemTypeCode": "氧气控制系统"
+	}, {
+		"systemCode": "topRollerShuttersControl",
+		"systemType": "rollerShutters",
+		"systemTypeCode": "顶卷帘系统"
+	}, {
+		"systemCode": "temperatureControl",
+		"systemType": "temperature",
+		"systemTypeCode": "温度控制系统"
+	}, {
+		"systemCode": "sunshadeControl",
+		"systemType": "sunshade",
+		"systemTypeCode": "遮阳控制系统"
+	}, {
+		"systemCode": "fillLightControl",
+		"systemType": "supplementaryLighting",
+		"systemTypeCode": "补光控制系统"
+	}, {
+		"systemCode": "draughtFanControl",
+		"systemType": "ventilate",
+		"systemTypeCode": "通风控制系统"
+	}]
+}

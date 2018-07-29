@@ -1,0 +1,36 @@
+{
+	"terminalType": {
+		"carbonDioxideControl": {
+			"functionName": "开",
+			"functionCode": "enable"
+		},
+		"draughtFanControl": {
+			"functionName": "开",
+			"functionCode": "enable"
+		},
+		"fillLightControl": {
+			"functionName": "开",
+			"functionCode": "enable"
+		},
+		"sideRollerShuttersControl": {
+			"functionName": "开",
+			"functionCode": "enable"
+		},
+		"sunshadeControl": {
+			"functionName": "开",
+			"functionCode": "enable"
+		},
+		"topRollerShuttersControl": {
+			"functionName": "开",
+			"functionCode": "enable"
+		},
+		"vavleControl": {
+			"functionName": "开",
+			"functionCode": "enable"
+		},
+		"waterRollerShuttersControl": {
+			"functionName": "开",
+			"functionCode": "enable"
+		}
+	}
+}
