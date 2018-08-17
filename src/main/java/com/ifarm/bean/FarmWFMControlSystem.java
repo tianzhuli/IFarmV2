@@ -11,6 +11,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.ifarm.annotation.LikeField;
+
 @Entity
 @Table(name = "farm_control_system_wfm")
 public class FarmWFMControlSystem {
@@ -19,14 +21,19 @@ public class FarmWFMControlSystem {
 	private Integer systemId;
 	private Integer farmId;
 	private String systemCode;
+	@LikeField
 	private String systemType;
 	private String systemTypeCode;
+	@LikeField
 	private String systemDistrict;
+	@LikeField
 	private String systemNo;
 	private Integer medicineNum;
 	private Integer districtNum;
 	private Integer fertierNum;
+	@LikeField
 	private String systemDescription;
+	@LikeField
 	private String systemLocation;
 	private Timestamp systemCreateTime;
 

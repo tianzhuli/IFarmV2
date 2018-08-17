@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSON;
 import com.ifarm.bean.FarmCollector;
 import com.ifarm.constant.SystemResultCodeEnum;
 import com.ifarm.dao.FarmCollectorDao;
@@ -64,4 +65,18 @@ public class FarmCollectorService {
 		return JsonObjectUtil.toJsonArrayString(farmCollectorDao.getDynamicList(farmCollector));
 	}
 	
+	public String farmCollectorsQueryLike(FarmCollector farmCollector) {
+		return JsonObjectUtil.toJsonArrayString(farmCollectorDao.getDynamicListAddLike(farmCollector));
+	}
+	
+	public String deleteFarmCollector(FarmCollector farmCollector) {
+		try {
+			farmCollectorDao.deleteBase(farmCollector);
+			return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.SUCCESS);
+		} catch (Exception e) {
+			// TODO: handle exception
+			farmCollector_log.error(JSON.toJSONString(farmCollector) + "-delete error", e);
+			return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.ERROR);
+		}
+	}
 }

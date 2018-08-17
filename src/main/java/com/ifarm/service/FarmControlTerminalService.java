@@ -15,9 +15,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.ifarm.bean.FarmControlDevice;
 import com.ifarm.bean.FarmControlSystem;
 import com.ifarm.bean.FarmControlTerminal;
+import com.ifarm.bean.FarmWFMControlSystem;
 import com.ifarm.constant.SystemResultCodeEnum;
 import com.ifarm.dao.FarmControlDeviceDao;
 import com.ifarm.dao.FarmControlSystemDao;
+import com.ifarm.dao.FarmControlSystemWFMDao;
 import com.ifarm.dao.FarmControlTerminalDao;
 import com.ifarm.util.JsonObjectUtil;
 import com.ifarm.util.SystemResultEncapsulation;
@@ -31,7 +33,9 @@ public class FarmControlTerminalService {
 	private FarmControlDeviceDao farmControlDeviceDao;
 	@Autowired
 	private FarmControlSystemDao farmControlSystemDao;
-
+	@Autowired
+	private FarmControlSystemWFMDao farmControlSystemWFMDao;
+	
 	String[] controlTerminalKeys = { "functionName", "functionCode" };
 
 	private static final Logger FARM_CONTROL_TERMINAL_SERVICE_LOGGER = LoggerFactory.getLogger(FarmControlTerminalService.class);
@@ -55,18 +59,17 @@ public class FarmControlTerminalService {
 
 	public String saveFarmControlSystem(FarmControlTerminal farmControlTerminal) {
 		try {
-			// Integer terminalId=
-			// farmControlTerminalDao.saveFarmControlTerminal(farmControlTerminal);
 			if (farmControlTerminal.getControlDeviceId() == null || farmControlTerminal.getSystemId() == null
 					|| farmControlTerminal.getControlDeviceBit() == null) {
 				return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.NO_ID);
 			}
 			FarmControlDevice farmControlDevice = farmControlDeviceDao.getTById(farmControlTerminal.getControlDeviceId(), FarmControlDevice.class);
-			if (farmControlDevice != null) {
+			if (farmControlDevice == null) {
 				return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.NO_DEVICE);
 			}
 			FarmControlSystem farmControlSystem = farmControlSystemDao.getTById(farmControlTerminal.getSystemId(), FarmControlSystem.class);
-			if (farmControlSystem != null) {
+			FarmWFMControlSystem fWfmControlSystem = farmControlSystemWFMDao.getTById(farmControlTerminal.getSystemId(), FarmWFMControlSystem.class);
+			if (farmControlSystem == null && fWfmControlSystem == null) {
 				return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.NO_SMYSTM);
 			}
 			farmControlTerminalDao.saveFarmControlTerminal(farmControlTerminal);

@@ -46,9 +46,8 @@ public class ControlTaskRedisHelper extends BaseLockRedisHelper<Long, ControlTas
 		return removeFlat;
 	}
 	
-	public void updateControlTaskListValu(String key,ControlTask controlTask) {
+	public void updateControlTaskListValue(String key,ControlTask controlTask) {
 		Object lock = getLock(key);
-		key = redisKeyName + key;
 		synchronized (lock) {
 			List<ControlTask> list= getRedisListValues(key);
 			for (int i = 0; i < list.size(); i++) {
@@ -61,7 +60,6 @@ public class ControlTaskRedisHelper extends BaseLockRedisHelper<Long, ControlTas
 	}
 	
 	public ControlTask queryControlTask(String key,ControlTask controlTask) {
-		key = redisKeyName + key;
 		List<ControlTask> list = getRedisListValues(key);
 		if (list != null) {
 			for (int i = 0; i < list.size(); i++) {
@@ -72,5 +70,18 @@ public class ControlTaskRedisHelper extends BaseLockRedisHelper<Long, ControlTas
 			}
 		}
 		return controlTask;
+	}
+	
+	public ControlTask queryControlTask(String key,Integer taskId) {
+		List<ControlTask> list = getRedisListValues(key);
+		if (list != null) {
+			for (int i = 0; i < list.size(); i++) {
+				ControlTask task = list.get(i);
+				if (task.getControllerLogId().equals(taskId)) {
+					return task;
+				}
+			}
+		}
+		return null;
 	}
 }

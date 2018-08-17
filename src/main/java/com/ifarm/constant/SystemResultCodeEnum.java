@@ -22,6 +22,7 @@ public class SystemResultCodeEnum {
 	 * 设备添加返回状态
 	 */
 	public static final String NO_ID = "no_id";
+	public static final String NO_TOKEN = "no_token";
 	public static final String NO_DEVICE = "no_device";
 	public static final String NO_SMYSTM = "no_system";
 	public static final String CHECK_ERROR = "check_error";

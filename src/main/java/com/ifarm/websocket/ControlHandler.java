@@ -179,6 +179,9 @@ public class ControlHandler extends TextWebSocketHandler implements WebSocketObs
 	@Override
 	public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
 		CacheDataBase.userControlData.removeObserver(session);
+		if (exception.getMessage().equals("java.io.EOFException")) {
+			controlHandler_log.error("java.io.EOFException");
+		}
 		controlHandler_log.error("handleTransportError", exception);
 	}
 

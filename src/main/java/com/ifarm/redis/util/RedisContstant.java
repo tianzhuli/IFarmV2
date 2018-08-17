@@ -35,5 +35,7 @@ public class RedisContstant {
 	
 	public static final String CONTROL_TASK_CACHE = "control_task_cache_";
 	public static final String WFM_CONTROL_TASK_CACHE = "wfm_control_task_cache_";
+	
+	public static final String COLLECTOR_COMMAND = "collector_command_cache_";
 
 }

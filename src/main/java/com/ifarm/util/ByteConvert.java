@@ -96,7 +96,7 @@ public class ByteConvert {
 	}
 
 	public static void main(String[] arg0) {
-		byte[] arr = convertTobyte("17", true);
+		byte[] arr = convertTobyte("1757687", true);
 		for (int i = 0; i < arr.length; i++) {
 			System.out.println(Integer.toHexString(arr[i] & 0xff));
 		}

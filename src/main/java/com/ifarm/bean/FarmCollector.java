@@ -6,14 +6,19 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.ifarm.annotation.LikeField;
+
 @Entity
 @Table(name = "farm_collector")
 public class FarmCollector {
 	@Id
 	private Long collectorId;
 	private Integer farmId;
+	@LikeField
 	private String collectorLocation;
+	@LikeField
 	private String collectorType;
+	@LikeField
 	private String collectorVersion;
 	private Timestamp collectorCreateTime;
 

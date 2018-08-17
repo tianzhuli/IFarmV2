@@ -289,17 +289,15 @@ public class ControlTask implements Serializable {
 		ControlCommand command = null;
 		if ("execution".equals(type)) {
 			commandCategory = "execution";
-			command = new ControlCommand(this, commandCategory, level, controlTerminalbits, controlDeviceId);
+			command = new ControlCommand(this, commandCategory, controlTerminalbits, controlDeviceId);
 		} else if ("stop".equals(type)) {
 			commandCategory = "stop";
-			command = new ControlCommand(this, commandCategory, level, controlDeviceId);
+			command = new ControlCommand(this, commandCategory, controlTerminalbits, controlDeviceId);
 		} else {
 			command = new ControlCommand();
 		}
 		return command;
 	}
-
-	
 
 	/**
 	 * 每次用户查询的结果，组成相对应的json 底层硬件现在不能返回修改时间

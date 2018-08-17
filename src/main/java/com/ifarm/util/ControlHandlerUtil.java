@@ -45,7 +45,9 @@ public class ControlHandlerUtil {
 			return;
 		}
 		String commandCategory = command.getCommandCategory();
-		ControlTask controlTask = command.getControlTask();
+		Integer taskId = command.getTaskId();
+		String userId = command.getUserId();
+		ControlTask controlTask = CacheDataBase.controlTaskRedisHelper.queryControlTask(userId, taskId);
 		if ("execution".equals(commandCategory)) {
 			controlTask.setAddReceived(true);
 			controlTask.setAddResultTime(System.currentTimeMillis() / 1000);
@@ -70,6 +72,7 @@ public class ControlHandlerUtil {
 				controlTask.setStopResult(ControlTaskEnum.STOP_FAIL);
 			}
 		}
+		CacheDataBase.controlTaskRedisHelper.updateControlTaskListValue(controlTask.getUserId(), controlTask);
 		CacheDataBase.taskService.updateControlTask(controlTask);
 	}
 
@@ -98,7 +101,7 @@ public class ControlHandlerUtil {
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
-			controlHandlerUtil_log.error("revolationTask error",e);
+			controlHandlerUtil_log.error("revolationTask error", e);
 			jsonObject.put("response", ControlTaskEnum.ERROR);
 			return jsonObject.toString();
 		}
@@ -230,7 +233,7 @@ public class ControlHandlerUtil {
 				controlTask.setTaskState(ControlTaskEnum.STOPPING);
 				CacheDataBase.ioControlData.notifyObservers(collectorId); // 推送到长连接设备
 				json.put("response", ControlTaskEnum.RUNNING);
-				CacheDataBase.controlTaskRedisHelper.updateControlTaskListValu(userId, controlTask);
+				CacheDataBase.controlTaskRedisHelper.updateControlTaskListValue(userId, controlTask);
 			}
 		} else if ("query".equals(commandCategory)) {
 			json.put("response", ControlTaskEnum.NO_TASK);
@@ -286,7 +289,7 @@ public class ControlHandlerUtil {
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
-			controlHandlerUtil_log.error("userConfirmation error",e);
+			controlHandlerUtil_log.error("userConfirmation error", e);
 			jsonObject.put("response", ControlTaskEnum.ERROR);
 			return jsonObject.toString();
 		}
@@ -306,65 +309,87 @@ public class ControlHandlerUtil {
 	 */
 	public static String wfmControlDeviceReturnMessage(WFMControlCommand command, boolean flag) {
 		String commandCategory = command.getCommandCategory();
-		WFMControlTask controlTask = command.getWfmControlTask();
-		List<WFMControlCommand> list = controlTask.getWfmControlCommands();
+		String userId = command.getUserId();
+		Integer taskId = command.getTaskId();
+		WFMControlTask wfmControlTask = CacheDataBase.wfmControlTaskRedisHelper.queryControlTask(userId, taskId);
+		if (wfmControlTask == null) {
+			controlHandlerUtil_log.error(userId + "-" + taskId + "-null wfmControlTask");
+			return "";
+		}
+		List<WFMControlCommand> list = wfmControlTask.getWfmControlCommands();
 		if ("execution".equals(commandCategory)) {
-			command.setReceived(true);
-			command.setReceiveTime(System.currentTimeMillis() / 1000);
 			if (flag) { // 返回成功
-				command.setReceivedResult(ControlTaskEnum.EXEUTION_SUCCESS);
 				boolean isSuccess = true;
 				for (int i = 0; i < list.size(); i++) {
 					WFMControlCommand wCommand = list.get(i);
+					if (wCommand.getCommandId().equals(command.getCommandId())) {
+						wCommand.setReceived(true);
+						wCommand.setReceiveTime(System.currentTimeMillis() / 1000);
+						wCommand.setReceivedResult(ControlTaskEnum.EXEUTION_SUCCESS);
+					}
 					isSuccess &= wCommand.isReceived();
 					isSuccess &= (ControlTaskEnum.EXEUTION_SUCCESS.equals(wCommand.getReceivedResult()));
 				}
 				if (isSuccess) {
-					controlTask.setAddReceived(true);
-					controlTask.setAddResult(ControlTaskEnum.EXEUTION_SUCCESS);
-					controlTask.setAddResultTime(System.currentTimeMillis() / 1000);
-					controlTask.setTaskState(ControlTaskEnum.EXECUTING);
-					controlTask.setResponseMessage(ControlTaskEnum.EXECUTION_SUCCESS_RESPONSE);
-					CacheDataBase.userControlData.notifyObservers(controlTask.getUserId(), controlTask.pushUserMessage());// 通知用户
-					CacheDataBase.wTaskService.updateControlTask(controlTask);
+					wfmControlTask.setAddReceived(true);
+					wfmControlTask.setAddResult(ControlTaskEnum.EXEUTION_SUCCESS);
+					wfmControlTask.setAddResultTime(System.currentTimeMillis() / 1000);
+					wfmControlTask.setTaskState(ControlTaskEnum.EXECUTING);
+					wfmControlTask.setResponseMessage(ControlTaskEnum.EXECUTION_SUCCESS_RESPONSE);
+					CacheDataBase.userControlData.notifyObservers(wfmControlTask.getUserId(), wfmControlTask.pushUserMessage());// 通知用户
+					CacheDataBase.wTaskService.updateControlTask(wfmControlTask);
 				}
 			} else {
-				command.setReceivedResult(ControlTaskEnum.EXECUTION_FAIL);
-				controlTask.setAddResult(ControlTaskEnum.EXECUTION_FAIL);
-				controlTask.setAddReceived(true);
-				controlTask.setFaultIndentifying(command.getIndentifying());
-				// 发生紧急事件，开启失败，推送给用户
-				// CacheDataBase.userControlData.notifyObservers(controlTask.getUserId(),
-				// controlTask.pushUserMessage());// 通知用户
+				for (int i = 0; i < list.size(); i++) {
+					WFMControlCommand wCommand = list.get(i);
+					if (wCommand.getCommandId().equals(command.getCommandId())) {
+						wCommand.setReceived(true);
+						wCommand.setReceiveTime(System.currentTimeMillis() / 1000);
+						wCommand.setReceivedResult(ControlTaskEnum.EXECUTION_FAIL);
+					}
+				}
+				wfmControlTask.setAddResult(ControlTaskEnum.EXECUTION_FAIL);
+				wfmControlTask.setAddReceived(true);
+				wfmControlTask.setFaultIndentifying(command.getIndentifying());
 			}
 		} else if ("stop".equals(commandCategory)) {
-			command.setReceived(true);
-			command.setReceiveTime(System.currentTimeMillis() / 1000);
 			if (flag) {
-				command.setReceivedResult(ControlTaskEnum.STOP_SUCCESS);
 				boolean isSuccess = true;
 				for (int i = 0; i < list.size(); i++) {
 					WFMControlCommand wCommand = list.get(i);
-					isSuccess &= wCommand.isReceived();
-					isSuccess &= (ControlTaskEnum.STOP_SUCCESS.equals(wCommand.getReceivedResult()));
+					if (wCommand.getCommandId().equals(command.getCommandId())) {
+						wCommand.setStoped(true);
+						wCommand.setStopTime(System.currentTimeMillis() / 1000);
+						wCommand.setStopResult(ControlTaskEnum.STOP_SUCCESS);
+					}
+					isSuccess &= wCommand.isStoped();
+					isSuccess &= (ControlTaskEnum.STOP_SUCCESS.equals(wCommand.getStopResult()));
 				}
 				if (isSuccess) {
-					controlTask.setStopReceived(true);
-					controlTask.setStopTime(System.currentTimeMillis() / 1000);
-					controlTask.setStopResult(ControlTaskEnum.STOP_SUCCESS);
-					controlTask.setTaskState(ControlTaskEnum.STOPPED);
-					CacheDataBase.userControlData.notifyObservers(controlTask.getUserId(), controlTask.pushUserMessage());// 通知用户
-					CacheDataBase.wTaskService.updateControlTask(controlTask);
+					wfmControlTask.setStopReceived(true);
+					wfmControlTask.setStopTime(System.currentTimeMillis() / 1000);
+					wfmControlTask.setStopResult(ControlTaskEnum.STOP_SUCCESS);
+					wfmControlTask.setTaskState(ControlTaskEnum.STOPPED);
+					CacheDataBase.userControlData.notifyObservers(wfmControlTask.getUserId(), wfmControlTask.pushUserMessage());// 通知用户
+					CacheDataBase.wTaskService.updateControlTask(wfmControlTask);
 				}
 			} else {
-				command.setReceivedResult(ControlTaskEnum.STOP_FAIL);
-				controlTask.setStopReceived(true);
-				controlTask.setStopResult(ControlTaskEnum.STOP_FAIL);
-				controlTask.setFaultIndentifying(command.getIndentifying());
+				for (int i = 0; i < list.size(); i++) {
+					WFMControlCommand wCommand = list.get(i);
+					if (wCommand.getCommandId() == command.getCommandId()) {
+						wCommand.setReceived(true);
+						wCommand.setReceiveTime(System.currentTimeMillis() / 1000);
+						wCommand.setReceivedResult(ControlTaskEnum.STOP_FAIL);
+					}
+				}
+				wfmControlTask.setStopReceived(true);
+				wfmControlTask.setStopResult(ControlTaskEnum.STOP_FAIL);
+				wfmControlTask.setFaultIndentifying(command.getIndentifying());
 				// 发生紧急事件，开启失败，推送给用户
 			}
 		}
-		return controlTask.pushUserMessage();
+		CacheDataBase.wfmControlTaskRedisHelper.updateControlTaskListValue(userId, wfmControlTask);
+		return wfmControlTask.pushUserMessage();
 
 	}
 
@@ -497,7 +522,7 @@ public class ControlHandlerUtil {
 				}
 			}
 			wfmControlTask.setTaskState(ControlTaskEnum.STOPPING);
-			CacheDataBase.wfmControlTaskRedisHelper.updateControlTaskListValu(userId, wfmControlTask);
+			CacheDataBase.wfmControlTaskRedisHelper.updateControlTaskListValue(userId, wfmControlTask);
 			object.put("response", ControlTaskEnum.RUNNING);
 		} else if ("query".equals(commandCategory)) {
 			object.put("response", ControlTaskEnum.NO_TASK);

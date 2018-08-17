@@ -13,6 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.ifarm.annotation.LikeField;
+
+@SuppressWarnings("unchecked")
 public abstract class BaseDao<T> {
 	private SessionFactory sessionFactory;
 
@@ -59,7 +62,6 @@ public abstract class BaseDao<T> {
 		return t;
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<T> getDynamicList(T t) {
 		Session session = getSession();
 		DetachedCriteria criteria = DetachedCriteria.forClass(t.getClass());
@@ -69,6 +71,38 @@ public abstract class BaseDao<T> {
 			try {
 				if (fields[i].get(t) != null) {
 					criteria.add(Restrictions.eq(fields[i].getName(), fields[i].get(t)));
+				}
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				LOGGER.error("criteria add error", e);
+			}
+		}
+		List<T> list = null;
+		try {
+			Criteria crit = criteria.getExecutableCriteria(session);
+			list = crit.list();
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.error("criteria list error", e);
+		}
+		return list;
+	}
+
+	public List<T> getDynamicListAddLike(T t) {
+		Session session = getSession();
+		DetachedCriteria criteria = DetachedCriteria.forClass(t.getClass());
+		Field[] fields = t.getClass().getDeclaredFields();
+		for (int i = 0; i < fields.length; i++) {
+			fields[i].setAccessible(true);
+			try {
+				if (fields[i].get(t) != null) {
+					String fieldName = fields[i].getName();
+					LikeField likeField = fields[i].getAnnotation(LikeField.class);
+					if (likeField != null) {
+						criteria.add(Restrictions.like(fieldName, "%" + fields[i].get(t) + "%"));
+					} else {
+						criteria.add(Restrictions.eq(fieldName, fields[i].get(t)));
+					}
 				}
 			} catch (IllegalArgumentException | IllegalAccessException e) {
 				// TODO Auto-generated catch block

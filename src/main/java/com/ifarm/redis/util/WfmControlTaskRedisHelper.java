@@ -39,9 +39,8 @@ public class WfmControlTaskRedisHelper extends BaseLockRedisHelper<Long, WFMCont
 		return removeFlat;
 	}
 
-	public void updateControlTaskListValu(String key, WFMControlTask controlTask) {
+	public void updateControlTaskListValue(String key, WFMControlTask controlTask) {
 		Object lock = getLock(key);
-		key = redisKeyName + key;
 		synchronized (lock) {
 			List<WFMControlTask> list = getRedisListValues(key);
 			for (int i = 0; i < list.size(); i++) {
@@ -54,7 +53,6 @@ public class WfmControlTaskRedisHelper extends BaseLockRedisHelper<Long, WFMCont
 	}
 
 	public WFMControlTask queryControlTask(String key, WFMControlTask controlTask) {
-		key = redisKeyName + key;
 		List<WFMControlTask> list = getRedisListValues(key);
 		if (list != null) {
 			for (int i = 0; i < list.size(); i++) {
@@ -65,5 +63,18 @@ public class WfmControlTaskRedisHelper extends BaseLockRedisHelper<Long, WFMCont
 			}
 		}
 		return controlTask;
+	}
+	
+	public WFMControlTask queryControlTask(String key, Integer taskId) {
+		List<WFMControlTask> list = getRedisListValues(key);
+		if (list != null) {
+			for (int i = 0; i < list.size(); i++) {
+				WFMControlTask task = list.get(i);
+				if (task.getControllerLogId().equals(taskId)) {
+					return task;
+				}
+			}
+		}
+		return null;
 	}
 }

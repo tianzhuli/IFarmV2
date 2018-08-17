@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import com.ifarm.bean.ControlCommand;
 import com.ifarm.bean.WFMControlCommand;
 import com.ifarm.bean.WFMControlTask;
-import com.ifarm.util.CacheDataBase;
 
 @Component
 public class ControlCommandRedisHelper extends BaseLockRedisHelper<Long, ControlCommand> {
@@ -18,17 +17,17 @@ public class ControlCommandRedisHelper extends BaseLockRedisHelper<Long, Control
 		setRedisKeyName(RedisContstant.CONTROL_COMMAND_CACHE);
 	}
 
-	private void controlCommandIdProduce(ControlCommand command) {
+	/*private void controlCommandIdProduce(ControlCommand command) {
 		String commandId = CacheDataBase.machineCode + String.valueOf(command.hashCode());
 		command.setCommandId(commandId);
-	}
+	}*/
 
 	public void setCommandRedisListValue(String key, ControlCommand value) {
 		// TODO Auto-generated method stub
-		controlCommandIdProduce(value);
+		//controlCommandIdProduce(value);
 		super.addRedisListValue(key, value);
 	}
-
+	
 	public boolean removeControlCommand(String key, Integer controlTaskId) {
 		Object lock = getLock(key);
 		String redisKey = redisKeyName + key;

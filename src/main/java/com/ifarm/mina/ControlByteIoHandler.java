@@ -2,6 +2,7 @@ package com.ifarm.mina;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.Date;
 import java.util.LinkedList;
 
 import org.apache.commons.logging.Log;
@@ -16,6 +17,7 @@ import com.ifarm.bean.ControlCommand;
 import com.ifarm.observer.IoSessionObserver;
 import com.ifarm.redis.util.ControlCommandRedisHelper;
 import com.ifarm.util.ByteConvert;
+import com.ifarm.util.ByteUtil;
 import com.ifarm.util.CacheDataBase;
 import com.ifarm.util.Constants;
 import com.ifarm.util.ControlHandlerUtil;
@@ -85,47 +87,75 @@ public class ControlByteIoHandler extends IoHandlerAdapter implements IoSessionO
 		session.write(bytes);
 	}
 
+	public Long parserControlMessage(String message) {
+		int leftBracketIndex = message.indexOf('[');
+		int rightBracketIndex = message.indexOf(']');
+		int lineEndMark = message.indexOf('\n');
+		String deviceBaseDetail = message.substring(leftBracketIndex + 1, rightBracketIndex);
+		String[] baseDetailArray = deviceBaseDetail.split(",");
+		String deviceWorkingDetail = message.substring(rightBracketIndex + 2, lineEndMark);
+		String[] deviceWorkingArray = deviceWorkingDetail.split(",");
+		Long collectorId = Long.valueOf(baseDetailArray[1]);
+		String softVersion = baseDetailArray[2];
+		String simNo = baseDetailArray[3];
+		long deviceWorkingTime = convertData.getdataType5(ByteConvert.convertTobyte(deviceWorkingArray[0], true), 0);
+		long deviceRunningTime = convertData.getdataType5(ByteConvert.convertTobyte(deviceWorkingArray[1], true), 0);
+		int networkSignal = ByteConvert.convertTobyte(deviceWorkingArray[2], true)[0];
+		if (deviceWorkingArray.length > 3) {
+			int voltage = ByteConvert.convertTobyte(deviceWorkingArray[3], true)[0];
+			inHandler_log.info(" 供电电压:" + voltage * 1.0 / 10);
+		}
+		StringBuilder builder = new StringBuilder();
+		builder.append("物联网通讯器4G编号:").append(collectorId).append("-软件版本:").append(softVersion).append("-SIM:").append(simNo).append("-设备时间:")
+				.append(deviceWorkingTime).append("-设备运行时间:").append(deviceRunningTime).append("-信号强度:").append(networkSignal);
+		// Long collectorId = convertData.byteToConvertLong(arr, 4, 4);
+		inHandler_log.info(builder);
+		return collectorId;
+	}
+
+	public String parseSofaVersion(byte[] arr, int pos) {
+		StringBuilder builder = new StringBuilder("V");
+		for (int i = 0; i < 4; i++) {
+			builder.append((char)('0' + arr[pos + i])).append(".");
+		}
+		builder.deleteCharAt(builder.length() - 1);
+		return builder.toString();
+	}
+
+	public Long parserControlMessage(byte[] arr) {
+		Long collectorId = convertData.byteToConvertLong(arr, 4, 4);
+		String softVersion = parseSofaVersion(arr, 12);
+		Date deviceWorkingTime = new Date(convertData.getdataType5(arr, 16) * 1000);
+		Date deviceRunningTime = new Date(convertData.getdataType5(arr, 20) * 1000);
+		// 运行代码、故障代码、故障时间暂时不需要
+		String simNo = new String(arr, 32, 20); // 预留四个字节
+		int networkSignal = arr[56];
+		StringBuilder builder = new StringBuilder();
+		builder.append("物联网通讯器4G编号:").append(collectorId).append(";软件版本:").append(softVersion).append(";SIM:").append(simNo).append(";设备时间:")
+				.append(deviceWorkingTime).append(";设备运行时间:").append(deviceRunningTime).append(";信号强度:").append(networkSignal);
+		inHandler_log.info(builder);
+		return collectorId;
+	}
+
 	@Override
 	public void messageReceived(IoSession session, Object message) throws Exception {
 		byte[] arr = (byte[]) message;
 		LinkedList<ControlCommand> commandsLinkedList = (LinkedList<ControlCommand>) session.getAttribute("controlCommands");
-		if (arr[0] == '\r') { // 测试信号
-			String receiveMsg = new String(arr);
-			int leftBracketIndex = receiveMsg.indexOf('[');
-			int rightBracketIndex = receiveMsg.indexOf(']');
-			int lineEndMark = receiveMsg.indexOf('\n');
-			String deviceBaseDetail = receiveMsg.substring(leftBracketIndex + 1, rightBracketIndex);
-			String[] baseDetailArray = deviceBaseDetail.split(",");
-			String deviceWorkingDetail = receiveMsg.substring(rightBracketIndex + 2, lineEndMark);
-			String[] deviceWorkingArray = deviceWorkingDetail.split(",");
-			Long collectorId = Long.valueOf(baseDetailArray[1]);
-			String softVersion = baseDetailArray[2];
-			String simNo = baseDetailArray[3];
-			long deviceWorkingTime = convertData.getdataType5(ByteConvert.convertTobyte(deviceWorkingArray[0], true), 0);
-			long deviceRunningTime = convertData.getdataType5(ByteConvert.convertTobyte(deviceWorkingArray[1], true), 0);
-			int networkSignal = ByteConvert.convertTobyte(deviceWorkingArray[2], true)[0];
-			if (deviceWorkingArray.length > 3) {
-				int voltage = ByteConvert.convertTobyte(deviceWorkingArray[3], true)[0];
-				inHandler_log.info(" 供电电压:" + voltage * 1.0 / 10);
-			}
-			StringBuilder builder = new StringBuilder();
-			builder.append("物联网通讯器4G编号:").append(collectorId).append("-软件版本:").append(softVersion).append("-SIM:").append(simNo).append("-设备时间:")
-					.append(deviceWorkingTime).append("-设备运行时间:").append(deviceRunningTime).append("-信号强度:").append(networkSignal);
-			// Long collectorId = convertData.byteToConvertLong(arr, 4, 4);
+		if (arr.length > 50 && ByteUtil.checkByteEqual(arr, "00000000", 8, 4)) { // 心跳包长度较长
+			Long collectorId = parserControlMessage(arr);
 			session.setAttribute("collectorId", collectorId);
 			CacheDataBase.ioControlData.registerObserver(collectorId, session);
-			inHandler_log.info(builder);
 			ControlCommand command = commandRedisHelper.getRedisListValue(collectorId.toString());
 			while (command != null) {
 				session.write(command.commandToByte());
 				commandsLinkedList.add(command);
 				command = commandRedisHelper.getRedisListValue(collectorId.toString());
 			}
-		} else if (arr[0] == (byte) 0x68) { // 设备的回复命令
+		} else { // 设备回复
 			if (commandsLinkedList.size() > 0) {
 				ControlCommand command = commandsLinkedList.pop();
 				boolean flag = false;
-				if (arr.length == 1) { // 只有fd，认为设备操作失败
+				if (arr.length <= 14) { // 长度判断设备操作失败，后续还需要确定
 					flag = false;
 				} else {
 					flag = true;
@@ -135,7 +165,6 @@ public class ControlByteIoHandler extends IoHandlerAdapter implements IoSessionO
 				inHandler_log.error("异常回复:" + message);
 			}
 		}
-
 	}
 
 	@Override

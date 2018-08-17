@@ -54,6 +54,11 @@ public class FarmControlSystemController {
 	public String deleteControlSystem(FarmControlSystem farmControlSystem) {
 		return farmControlSystemService.deleteFarmControlSystem(farmControlSystem);
 	}
+	
+	@RequestMapping("query")
+	public String queryControlSystem(FarmControlSystem farmControlSystem) {
+		return farmControlSystemService.queryFarmControlSystem(farmControlSystem);
+	}
 
 	@RequestMapping("wfm/addition")
 	public String wfmControlSystemAddition(FarmWFMControlSystem farmWFMControlSystem) {
@@ -63,6 +68,11 @@ public class FarmControlSystemController {
 	@RequestMapping("wfm/delete")
 	public String wfmControlSystemDelete(FarmWFMControlSystem farmWFMControlSystem) {
 		return farmControlSystemWFMService.deleteFarmControlSystem(farmWFMControlSystem);
+	}
+	
+	@RequestMapping("wfm/query")
+	public String wfmControlSystemQuery(FarmWFMControlSystem farmWFMControlSystem) {
+		return farmControlSystemWFMService.queryFarmControlSystem(farmWFMControlSystem);
 	}
 	
 	@RequestMapping("terminal/addition")

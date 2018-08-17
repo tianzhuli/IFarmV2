@@ -211,8 +211,8 @@ public class FarmControlSystemService {
 				}
 				hashSet.add((String) objects[3]);
 			}
-			WFMControlCommand command = new WFMControlCommand(controlTask, "execution", controlTask.getLevel(), deviceId, collectorId);
-			command.setForwardbits(forwardbits);
+			WFMControlCommand command = new WFMControlCommand(controlTask, "execution", deviceId, collectorId);
+			command.setControlTerminalbits(forwardbits);
 			command.setIndentifying(hashSet.toString());
 			controlTask.getWfmControlCommands().add(command);
 		}
@@ -242,5 +242,9 @@ public class FarmControlSystemService {
 			farmControlSystemService_log.error(JSON.toJSONString(farmControlSystem) + "-delete error", e);
 			return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.ERROR);
 		}
+	}
+	
+	public String queryFarmControlSystem(FarmControlSystem farmControlSystem) {
+		return JsonObjectUtil.toJsonArrayString(farmControlSystemDao.getDynamicListAddLike(farmControlSystem));
 	}
 }

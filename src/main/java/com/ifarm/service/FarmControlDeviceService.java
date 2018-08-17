@@ -29,7 +29,7 @@ public class FarmControlDeviceService {
 			return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.ID_EXIST);
 		}
 		try {
-			farmControlDeviceDao.saveFarmCollectorDevice(farmControlDevice);
+			farmControlDeviceDao.saveFarmControlDevice(farmControlDevice);
 			// CacheDataBase.controlDeviceDetailMap.put(deviceId,
 			// JsonObjectUtil.fromBean(farmControlDevice));
 			return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.SUCCESS);
@@ -57,6 +57,6 @@ public class FarmControlDeviceService {
 	}
 
 	public String queryFarmControlDevices(FarmControlDevice farmControlDevice) {
-		return JsonObjectUtil.toJsonArrayString(farmControlDeviceDao.getDynamicList(farmControlDevice));
+		return JsonObjectUtil.toJsonArrayString(farmControlDeviceDao.getDynamicListAddLike(farmControlDevice));
 	}
 }

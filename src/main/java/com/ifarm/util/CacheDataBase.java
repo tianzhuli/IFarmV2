@@ -56,7 +56,8 @@ public class CacheDataBase {
 	public static boolean receiveFlat = true;
 	public static Object sensorcachelock = new Object();
 	public static String machineCode = "101";
-
+	public static Integer collectorTime = 10; //分钟
+	
 	public static Map<String, String> sensorParamCodeMap = new HashMap<String, String>(); // 传感器code和类型的对应
 	public static Map<String, JSONArray> topicThemeMap = new HashMap<String, JSONArray>();
 	public static Map<String, Byte> controlBaseCommand = new HashMap<String, Byte>(); // 控制的基础命名
@@ -332,4 +333,6 @@ public class CacheDataBase {
 		 * } } } }, 10, 60, TimeUnit.SECONDS);
 		 */
 	}
+
+	
 }

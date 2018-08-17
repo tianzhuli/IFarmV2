@@ -100,7 +100,7 @@ public class ControlCacheCollection implements Runnable {
 	 * @param isStop
 	 *            标志位,是否从cache中移除task
 	 */
-	public void isStopControlTask(ControlTask task, String userId, BooleanWrapper booleanWrapper, boolean isStop, boolean isUpdateTask) {
+	public void recoverStopControlTask(ControlTask task, String userId, BooleanWrapper booleanWrapper, boolean isStop, boolean isUpdateTask) {
 		try {
 			if (isStop) {
 				controlTaskRedisHelper.removeControlTask(userId, task.getControllerLogId());
@@ -117,7 +117,7 @@ public class ControlCacheCollection implements Runnable {
 
 	}
 
-	public void wfdIsStopControlTask(WFMControlTask wTask, String userId, BooleanWrapper booleanWrapper, boolean isStop, boolean isUpdateTask) {
+	public void recoverStopControlTask(WFMControlTask wTask, String userId, BooleanWrapper booleanWrapper, boolean isStop, boolean isUpdateTask) {
 		try {
 			if (isStop) {
 				wfmControlTaskRedisHelper.removeWfmControlTask(userId, wTask.getControllerLogId());
@@ -148,15 +148,9 @@ public class ControlCacheCollection implements Runnable {
 			commandRedisHelper.setCommandRedisListValue(collectorId.toString(), command);
 			controlTask.setStartStopTime(System.currentTimeMillis() / 1000);
 			controlTask.setTaskState(ControlTaskEnum.STOPPING);
-			/*
-			 * PriorityBlockingQueue<ControlCommand> pQueue =
-			 * CacheDataBase.controlCommandCache.get(collectorId); if (pQueue !=
-			 * null) { pQueue.add(command);
-			 * controlTask.setStartStopTime(System.currentTimeMillis() / 1000);
-			 * controlTask.setTaskState(ControlTaskEnum.STOPPING); }
-			 */
 		}// 下发添加任务到设备
 		CacheDataBase.ioControlData.notifyObservers(collectorId);
+		controlTaskRedisHelper.updateControlTaskListValue(controlTask.getUserId(), controlTask);
 		controlCacheCollection_log.info("任务正在停止中......");
 	}
 
@@ -184,6 +178,7 @@ public class ControlCacheCollection implements Runnable {
 			}
 		}
 		wfmControlTask.setTaskState(ControlTaskEnum.STOPPING);
+		wfmControlTaskRedisHelper.updateControlTaskListValue(wfmControlTask.getUserId(), wfmControlTask);
 		controlCacheCollection_log.info("任务正在停止中......");
 	}
 
@@ -233,11 +228,11 @@ public class ControlCacheCollection implements Runnable {
 								if (ControlTaskEnum.STOP_FAIL.equals(controlTask.getStopResult())) {
 									controlTask.setResponseMessage(ControlTaskEnum.STOP_FAIL_RESPONSE);
 									CacheDataBase.userControlData.notifyObservers(userId, controlTask.pushUserMessage());// 通知用户
-									isStopControlTask(controlTask, userId, flat, true, true);
+									recoverStopControlTask(controlTask, userId, flat, true, true);
 									controlCacheCollection_log.info("停止失败的：" + userId + "集中器回收");
 								} else if (ControlTaskEnum.STOP_SUCCESS.equals(controlTask.getStopResult())) {
 									controlTask.setResponseMessage(ControlTaskEnum.STOP_SUCESS_RESPONSE);
-									isStopControlTask(controlTask, userId, flat, true, true);
+									recoverStopControlTask(controlTask, userId, flat, true, true);
 									controlCacheCollection_log.info("已经收到停止指令的：" + userId + "集中器回收");
 								}
 								continue;
@@ -247,7 +242,7 @@ public class ControlCacheCollection implements Runnable {
 									long compare = Timestamp.valueOf(format.format(new Date())).getTime() / 1000 - controlTask.getStartStopTime();
 									if (compare >= this.offset) {
 										controlTask.setResponseMessage(ControlTaskEnum.STOP_TIMEOUT_RESPONSE);
-										isStopControlTask(controlTask, userId, flat, true, true);
+										recoverStopControlTask(controlTask, userId, flat, true, true);
 										CacheDataBase.userControlData.notifyObservers(userId, controlTask.pushUserMessage());// 通知用户
 										// clearControlTaskCommand(controlTask,
 										// collectorId);
@@ -257,7 +252,7 @@ public class ControlCacheCollection implements Runnable {
 								}
 								if (ControlTaskEnum.EXECUTION_FAIL.equals(controlTask.getAddResult())) {
 									controlTask.setResponseMessage(ControlTaskEnum.EXECUTION_FAIL_RESPONSE);
-									isStopControlTask(controlTask, userId, flat, true, true);
+									recoverStopControlTask(controlTask, userId, flat, true, true);
 									CacheDataBase.userControlData.notifyObservers(userId, controlTask.pushUserMessage());// 通知用户
 									controlCacheCollection_log.info("任务执行失败的：" + userId + "集中器回收");
 									continue;
@@ -277,7 +272,7 @@ public class ControlCacheCollection implements Runnable {
 										- controlTask.getStartExecutionTime().getTime() / 1000;
 								if (current >= this.offset * this.timeout) {
 									controlTask.setResponseMessage(ControlTaskEnum.EXECUTION_TIMEOUT_RESPONSE);
-									isStopControlTask(controlTask, userId, flat, true, true);
+									recoverStopControlTask(controlTask, userId, flat, true, true);
 									CacheDataBase.userControlData.notifyObservers(userId, controlTask.pushUserMessage());// 通知用户
 									// clearControlTaskCommand(controlTask,
 									// collectorId);
@@ -289,10 +284,10 @@ public class ControlCacheCollection implements Runnable {
 							// TODO: handle exception
 							e.printStackTrace();
 							controlCacheCollection_log.error("回收对象异常：" + e);
-							isStopControlTask(controlTask, userId, flat, true, true);
+							recoverStopControlTask(controlTask, userId, flat, true, true);
 						}
 						if (flat.isFlag()) {
-							controlTaskRedisHelper.updateControlTaskListValu(userId, controlTask);
+							controlTaskRedisHelper.updateControlTaskListValue(userId, controlTask);
 						}
 						// 更新状态
 					}
@@ -338,12 +333,12 @@ public class ControlCacheCollection implements Runnable {
 							if (wfmControlTask.isStopReceived()) {
 								if (ControlTaskEnum.STOP_FAIL.equals(wfmControlTask.getStopResult())) {
 									wfmControlTask.setResponseMessage(ControlTaskEnum.STOP_FAIL_RESPONSE);
-									wfdIsStopControlTask(wfmControlTask, userId, flat, true, true);
+									recoverStopControlTask(wfmControlTask, userId, flat, true, true);
 									CacheDataBase.userControlData.notifyObservers(userId, wfmControlTask.pushUserMessage());// 通知用户
 									controlCacheCollection_log.info("停止失败的：" + userId + "集中器回收");
 								} else if (ControlTaskEnum.STOP_SUCCESS.equals(wfmControlTask.getStopResult())) {
 									wfmControlTask.setResponseMessage(ControlTaskEnum.STOP_SUCESS_RESPONSE);
-									wfdIsStopControlTask(wfmControlTask, userId, flat, true, true);
+									recoverStopControlTask(wfmControlTask, userId, flat, true, true);
 									controlCacheCollection_log.info("已经收到停止指令的：" + userId + "集中器回收");
 								}
 								// CacheDataBase.userControlData.notifyObservers(userId,
@@ -356,7 +351,7 @@ public class ControlCacheCollection implements Runnable {
 									long compare = Timestamp.valueOf(format.format(new Date())).getTime() / 1000 - wfmControlTask.getStartStopTime();
 									if (compare >= this.offset) {
 										wfmControlTask.setResponseMessage(ControlTaskEnum.STOP_TIMEOUT_RESPONSE);
-										wfdIsStopControlTask(wfmControlTask, userId, flat, true, true);
+										recoverStopControlTask(wfmControlTask, userId, flat, true, true);
 										CacheDataBase.userControlData.notifyObservers(userId, wfmControlTask.pushUserMessage());// 通知用户
 										// wfmClearControlTaskCommand(wfmControlTask);
 										controlCacheCollection_log.info(compare + "s长时间未收到停止回复：" + wfmControlTask.getControllerLogId() + "任务");
@@ -365,9 +360,9 @@ public class ControlCacheCollection implements Runnable {
 								}
 								if (ControlTaskEnum.EXECUTION_FAIL.equals(wfmControlTask.getAddResult())) {
 									wfmControlTask.setResponseMessage(ControlTaskEnum.EXECUTION_FAIL_RESPONSE);
-									wfdIsStopControlTask(wfmControlTask, userId, flat, false, true);
+									recoverStopControlTask(wfmControlTask, userId, flat, false, true);
 									// 需要紧急停止，下发停止指令
-									wfmControlTaskStopCommandProduce(wfmControlTask);
+									// wfmControlTaskStopCommandProduce(wfmControlTask);
 									CacheDataBase.userControlData.notifyObservers(userId, wfmControlTask.pushUserMessage());// 通知用户
 									controlCacheCollection_log.info("任务执行失败的：" + userId + "集中器回收");
 									continue;
@@ -387,7 +382,7 @@ public class ControlCacheCollection implements Runnable {
 										- wfmControlTask.getStartExecutionTime().getTime() / 1000;
 								if (current >= this.offset * this.timeout) {
 									wfmControlTask.setResponseMessage(ControlTaskEnum.EXECUTION_TIMEOUT_RESPONSE);
-									wfdIsStopControlTask(wfmControlTask, userId, flat, true, true);
+									recoverStopControlTask(wfmControlTask, userId, flat, true, true);
 									CacheDataBase.userControlData.notifyObservers(userId, wfmControlTask.pushUserMessage());// 通知用户
 									// wfmClearControlTaskCommand(wfmControlTask);
 									// 考虑是否下发停止命令，有可能是部分设备未收到，其他设备已经开始运行了
@@ -399,11 +394,12 @@ public class ControlCacheCollection implements Runnable {
 							// TODO: handle exception
 							e.printStackTrace();
 							controlCacheCollection_log.error("回收对象异常：" + e);
-							wfdIsStopControlTask(wfmControlTask, userId, flat, true, true);
+							recoverStopControlTask(wfmControlTask, userId, flat, true, true);
 							// 清除异常的任务
 						}
 						if (flat.isFlag()) {
-							wfmControlTaskRedisHelper.updateControlTaskListValu(userId, wfmControlTask);;
+							wfmControlTaskRedisHelper.updateControlTaskListValue(userId, wfmControlTask);
+							;
 						}
 					}
 

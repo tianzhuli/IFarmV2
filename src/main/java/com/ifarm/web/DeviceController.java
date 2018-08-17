@@ -58,24 +58,39 @@ public class DeviceController {
 	String collectorDeviceAddition(FarmCollectorDevice farmCollectorDevice) {
 		return farmCollectorDeviceService.saveCollectorDevice(farmCollectorDevice);
 	}
+	
+	@RequestMapping("controlDevice/addition")
+	String controlDeviceAddition(FarmControlDevice farmControlDevice) {
+		return farmControlDeviceService.saveFarmControlDevice(farmControlDevice);
+	}
 
-	@RequestMapping("collectorDevice/delete")
+	@RequestMapping("collectorDevice/query")
 	String collectorDeviceQuery(FarmCollectorDevice farmCollectorDevice) {
 		return farmCollectorDeviceService.queryFarmCollectorDevices(farmCollectorDevice);
 	}
 
-	@RequestMapping("controlDevice/delete")
+	@RequestMapping("controlDevice/query")
 	String controlDeviceQuery(FarmControlDevice farmControlDevice) {
 		return farmControlDeviceService.queryFarmControlDevices(farmControlDevice);
 	}
+	
+	@RequestMapping("concentrator/query")
+	String concentratorQuery(FarmCollector farmCollector) {
+		return farmCollectorService.getFarmCollectorsList(farmCollector);
+	}
 
-	@RequestMapping("collectorDevice/query")
+	@RequestMapping("collectorDevice/delete")
 	String collectorDeviceDelet(FarmCollectorDevice farmCollectorDevice) {
 		return farmCollectorDeviceService.deleteFarmCollectorDevice(farmCollectorDevice);
 	}
 
-	@RequestMapping("controlDevice/query")
+	@RequestMapping("controlDevice/delete")
 	String controlDeviceDelete(FarmControlDevice farmControlDevice) {
 		return farmControlDeviceService.deleteFarmControlDevice(farmControlDevice);
+	}
+	
+	@RequestMapping("concentrator/delete")
+	String concentratorDelete(FarmCollector farmCollector) {
+		return farmCollectorService.deleteFarmCollector(farmCollector);
 	}
 }

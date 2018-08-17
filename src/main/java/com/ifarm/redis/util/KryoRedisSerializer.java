@@ -16,6 +16,8 @@ import com.esotericsoftware.kryo.io.Output;
 public class KryoRedisSerializer<T> implements RedisSerializer<T> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(KryoRedisSerializer.class);
+	private static final int bufferSize = 1024;
+	private static final int maxBufferSize = 20480;
 
 	@Override
 	public byte[] serialize(T t) throws SerializationException {
@@ -24,7 +26,7 @@ public class KryoRedisSerializer<T> implements RedisSerializer<T> {
 			throw new NullPointerException();
 		}
 		Kryo kryo = new Kryo();
-		Output output = new Output(256, 10240);
+		Output output = new Output(bufferSize, maxBufferSize);
 		try {
 			kryo.writeClassAndObject(output, t);
 		} catch (Exception e) {
@@ -39,6 +41,9 @@ public class KryoRedisSerializer<T> implements RedisSerializer<T> {
 	@Override
 	public T deserialize(byte[] bytes) throws SerializationException {
 		// TODO Auto-generated method stub
+		if (bytes == null || bytes.length == 0) {
+			return null;
+		}
 		Kryo kryo = new Kryo();
 		Input input = new Input();
 		try {

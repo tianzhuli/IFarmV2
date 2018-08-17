@@ -19,7 +19,7 @@ public class FarmControlSystemWFMService {
 	@Autowired
 	private FarmControlSystemWFMDao farmControlSystemWFMDao;
 	private static final Logger farmControlSystemService_log = LoggerFactory.getLogger(FarmControlSystemWFMService.class);
-	
+
 	public String saveControlSystem(FarmWFMControlSystem farmControlSystem) {
 		Integer farmId = farmControlSystem.getFarmId();
 		if (farmId == null) {
@@ -32,7 +32,7 @@ public class FarmControlSystemWFMService {
 			farmControlSystem.setSystemTypeCode("waterFertilizerMedicineControl");
 			Integer systemId = farmControlSystemWFMDao.saveFarmControlSystem(farmControlSystem);
 			jsonObject.put("systemId", systemId);
-			//CacheDataBase.controlSystemValueMap.put(systemId, jsonObject);
+			// CacheDataBase.controlSystemValueMap.put(systemId, jsonObject);
 			return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.SUCCESS);
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -41,7 +41,7 @@ public class FarmControlSystemWFMService {
 			return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.ERROR);
 		}
 	}
-	
+
 	public String farmControlSystemWFMTerimal(FarmWFMControlSystem fControlSystem) {
 		JSONArray jsonArray = new JSONArray();
 		FarmWFMControlSystem fWfmControlSystem = farmControlSystemWFMDao.getTById(fControlSystem.getSystemId(), FarmWFMControlSystem.class);
@@ -90,11 +90,11 @@ public class FarmControlSystemWFMService {
 		}
 		return jsonArray.toString();
 	}
-	
+
 	public FarmWFMControlSystem getFarmControlSystemById(Integer systemId) {
 		return farmControlSystemWFMDao.getTById(systemId, FarmWFMControlSystem.class);
 	}
-	
+
 	public String deleteFarmControlSystem(FarmWFMControlSystem farmControlSystem) {
 		try {
 			farmControlSystemWFMDao.deleteBase(farmControlSystem);
@@ -104,5 +104,9 @@ public class FarmControlSystemWFMService {
 			farmControlSystemService_log.error(JSON.toJSONString(farmControlSystem) + "-delete error", e);
 			return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.ERROR);
 		}
+	}
+
+	public String queryFarmControlSystem(FarmWFMControlSystem farmControlSystem) {
+		return JsonObjectUtil.toJsonArrayString(farmControlSystemWFMDao.getDynamicListAddLike(farmControlSystem));
 	}
 }
