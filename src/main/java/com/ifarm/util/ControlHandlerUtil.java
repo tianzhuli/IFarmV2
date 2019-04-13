@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ifarm.bean.ControlCommand;
-import com.ifarm.bean.ControlSystem;
 import com.ifarm.bean.ControlTask;
 import com.ifarm.bean.MultiControlCommand;
 import com.ifarm.bean.MultiControlTask;

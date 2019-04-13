@@ -54,8 +54,8 @@ public class CustomServerHandler extends ChannelInboundHandlerAdapter {
 	private AttributeKey<LinkedList<ControlCommand>> controlCommandAttributeKey = AttributeKey
 			.valueOf("controlCommands");
 
-	private AttributeKey<Long> collecotrAttributeKey = AttributeKey
-			.valueOf("controlCommands");
+	private AttributeKey<Long> collectorAttributeKey = AttributeKey
+			.valueOf("collector");
 	ConvertData convertData = new ConvertData();
 	@Autowired
 	private CommandConvertService commandConvertService;
@@ -109,7 +109,7 @@ public class CustomServerHandler extends ChannelInboundHandlerAdapter {
 			if (arr.length > 50
 					&& ByteUtil.checkByteEqual(arr, "00000000", 8, 4)) { // 心跳包长度较长
 				Long collectorId = CommonUtil.parserHeartMessage(arr);
-				ctx.attr(collecotrAttributeKey).set(collectorId);
+				ctx.attr(collectorAttributeKey).set(collectorId);
 				CacheDataBase.channelHandlerContextMap.put(collectorId, ctx);
 				ControlCommand command = commandRedisHelper
 						.getRedisListValue(collectorId.toString());
@@ -134,7 +134,7 @@ public class CustomServerHandler extends ChannelInboundHandlerAdapter {
 				}
 			} else { // 设备相应回复
 				CommonUtil.messageDigest(arr, "collecotor receive");
-				Long collectorId = ctx.attr(collecotrAttributeKey).get();
+				Long collectorId = ctx.attr(collectorAttributeKey).get();
 				if (collectorId != null) {
 					int deviceType = arr[3];
 					BaseCollectorDeviceParse parse = this.deviceParseMap
@@ -244,7 +244,7 @@ public class CustomServerHandler extends ChannelInboundHandlerAdapter {
 	}
 
 	public void notifySend(ChannelHandlerContext ctx) throws Exception {
-		Long collectorId = ctx.attr(collecotrAttributeKey).get();
+		Long collectorId = ctx.attr(collectorAttributeKey).get();
 		Attribute<LinkedList<ControlCommand>> commandsAttribute = ctx
 				.attr(controlCommandAttributeKey);
 		ControlCommand command = commandRedisHelper

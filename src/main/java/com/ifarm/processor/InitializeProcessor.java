@@ -111,7 +111,14 @@ public class InitializeProcessor implements
 			collectServer.start();
 			if ((boolean) CacheDataBase.systemConfigCacheMap
 					.get(SystemConfigCache.SWITCH_CHANNEL_TYPE)) {
-				nettyServer.init(CacheDataBase.controlPort);
+				CacheDataBase.controlService.execute(new Runnable() {
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						nettyServer.init(CacheDataBase.controlPort);
+					}
+				});
 			} else {
 				controlServer.start();
 			}
