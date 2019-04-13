@@ -7,7 +7,7 @@ import com.ifarm.bean.ControlTask;
 import com.ifarm.dao.ControlTaskDao;
 
 @Service
-public class ControlTaskService {
+public class ControlTaskService extends AbstractFarmService<ControlTaskDao, ControlTask> {
 	@Autowired
 	private ControlTaskDao controlTaskDao;
 

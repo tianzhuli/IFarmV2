@@ -11,6 +11,15 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.ifarm.annotation.TransientField;
+import com.ifarm.enums.DeviceValueType;
+
+/**
+ * 老版本的deviceValue的坑，目前暂时不能删除，反序列化找不到
+ * 
+ * @author lab
+ * 
+ */
 @Entity
 @Table(name = "collector_device_value")
 public class CollectorDeviceValue extends DeviceValueBase {
@@ -18,9 +27,11 @@ public class CollectorDeviceValue extends DeviceValueBase {
 	 * 
 	 */
 	@Transient
+	@TransientField
 	private static final long serialVersionUID = -3614143073913290853L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@TransientField
 	private Integer deviceValueId;
 	private Long deviceId;
 	private Integer illumination;
@@ -144,6 +155,12 @@ public class CollectorDeviceValue extends DeviceValueBase {
 			}
 		}
 		return stringBuilder.toString();
+	}
+
+	@Override
+	public DeviceValueType getDeviceValueTyle() {
+		// TODO Auto-generated method stub
+		return DeviceValueType.COLLECOT_TYPE_FIVE;
 	}
 
 }

@@ -163,7 +163,7 @@ public class UserService {
 				String userImagePath = FileUtil.makeRealPathUrl(CacheDataBase.userImagePath, user.getUserBackImageUrl(), userId);
 				user.setUserBackImageUrl(userImagePath);
 			}
-			return JsonObjectUtil.toJsonObjectString(user).toString();
+			return JsonObjectUtil.toJsonObject(user).toString();
 		} else {
 			return SystemResultCodeEnum.NO_USER;
 		}

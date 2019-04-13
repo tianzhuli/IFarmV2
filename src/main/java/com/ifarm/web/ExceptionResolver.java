@@ -1,25 +1,23 @@
 package com.ifarm.web;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.HandlerExceptionResolver;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-@Component
-public class ExceptionResolver implements HandlerExceptionResolver{
-	
+@ControllerAdvice
+public class ExceptionResolver {
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionResolver.class);
-	
-	@Override
-	public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-		// TODO Auto-generated method stub
-		ex.printStackTrace();
-		LOGGER.error("error",ex);
-		return null;
+
+	@ExceptionHandler(value = Exception.class)
+	@ResponseBody
+	public String defaultHandle(HttpServletRequest request, Exception e) {
+		LOGGER.error("{} is {}", request.getRequestURL(), e);
+		return e.getMessage();
 	}
 
 }

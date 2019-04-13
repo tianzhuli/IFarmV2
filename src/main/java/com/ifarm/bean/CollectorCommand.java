@@ -1,8 +1,11 @@
 package com.ifarm.bean;
 
+import java.io.Serializable;
+
 import com.ifarm.util.ByteConvert;
 
-public class CollectorCommand {
+public class CollectorCommand implements Serializable {
+	private static final long serialVersionUID = 7909726621613846968L;
 	private Integer deviceId;
 	private Integer deviceNo;
 
@@ -26,7 +29,11 @@ public class CollectorCommand {
 		this.deviceId = deviceId;
 		this.deviceNo = deviceNo;
 	}
-
+	
+	public CollectorCommand() {
+		
+	}
+ 
 	public static CollectorCommand productionCommand(Integer deviceId, Integer deviceNo) {
 		return new CollectorCommand(deviceId, deviceNo);
 	}
@@ -34,9 +41,9 @@ public class CollectorCommand {
 	public byte[] commandToByte() {
 		byte[] arr = new byte[9];
 		arr[0] = (byte) deviceNo.intValue();
-		byte[] deviceArray = ByteConvert.convertTobyte(String.valueOf(deviceId), true);
+		byte[] deviceArray = ByteConvert.convertTobyte(String.valueOf(deviceId), false);
 		for (int i = 0; i < deviceArray.length; i++) {
-			arr[i + 1] = deviceArray[0];
+			arr[i + 1] = deviceArray[i];
 		}
 		arr[5] = 0x01;
 		arr[6] = 0x00;

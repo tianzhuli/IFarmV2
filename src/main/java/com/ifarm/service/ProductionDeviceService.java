@@ -1,7 +1,5 @@
 package com.ifarm.service;
 
-import java.util.Calendar;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,8 +113,7 @@ public class ProductionDeviceService {
 		return jsonObject;
 	}
 	
-	public static void main(String[] args) {
-		System.out.println(Calendar.getInstance().getWeekYear() % 100);
+	public ProductionDevice queryProductionDevice(Integer deviceId) {
+		return productionDeviceDao.getTById(deviceId, ProductionDevice.class);
 	}
-
 }

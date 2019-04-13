@@ -23,7 +23,7 @@ public class CollectorDeviceRedisTest {
 		List<DeviceValueBase> list = redisUtil.getCollectorDeviceCacheValue(new Long(10000001));
 		for (int i = 0; i < list.size(); i++) {
 			DeviceValueBase deviceValueBase = list.get(i);
-			System.out.println(JsonObjectUtil.toJsonObjectString(deviceValueBase));
+			System.out.println(JsonObjectUtil.toJsonObject(deviceValueBase));
 		}
 	}
 }

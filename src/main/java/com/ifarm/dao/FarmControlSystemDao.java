@@ -59,27 +59,49 @@ public class FarmControlSystemDao extends BaseDao<FarmControlSystem> {
 	 * @param systemId
 	 * @return
 	 */
-	public List farmControlSystemToTerminal(Integer systemId) {
+	public List farmControlUnitToTerminal(Integer untiId) {
 		Session session = getSession();
-		String sql = "SELECT t.terminalId,t.controlDeviceId,t.systemId,t.controlDeviceBit,t.controlType,t.functionCode,t.terminalIdentifying,t.terminalCreateTime FROM FarmControlTerminal t,FarmControlSystem s where t.systemId = s.systemId and s.systemId = ?";
+		String sql = "SELECT t.terminalId,t.controlDeviceId,t.unitId,t.controlDeviceBit,t.controlType,t.functionCode,t.terminalIdentifying,t.terminalCreateTime FROM FarmControlTerminal t where t.unitId = ?";
 		Query query = session.createQuery(sql);
-		query.setParameter(0, systemId);
+		query.setParameter(0, untiId);
 		return query.list();
 	}
 
 	/**
-	 * 水肥药系统是单独处理，业务逻辑完全不一样
+	 * 复合系统（如水肥药）是单独处理，业务逻辑完全不一样
 	 * 
 	 * @param systemId
 	 * @return
 	 */
-	public List farmWFMControlSystemToTerminal(Integer systemId, String terminalIdentifying) {
+	public List farmMultiControlUnitToTerminal(Integer untiId, String terminalIdentifying) {
 		Session session = getSession();
-		String sql = "SELECT t.controlDeviceId,t.controlDeviceBit,t.functionCode,t.terminalIdentifying FROM FarmControlTerminal t where t.systemId = ? and t.terminalIdentifying = ?";
+		String sql = "SELECT t.controlDeviceId,t.controlDeviceBit,t.functionCode,t.terminalIdentifying FROM FarmControlTerminal t where t.unitId = ? and t.terminalIdentifying = ?";
 		Query query = session.createQuery(sql);
-		query.setParameter(0, systemId);
+		query.setParameter(0, untiId);
 		query.setParameter(1, terminalIdentifying);
 		return query.list();
+	}
+	
+	public List controlSystemRegion(String farmId) {
+		Session session = getSession();
+		String sql = "SELECT sys.systemDistrict,sys.systemLocation FROM (SELECT c.farmId,c.systemDistrict,c.systemLocation FROM farm_control_system c "
+				+ "UNION ALL SELECT w.farmId,w.systemDistrict,w.systemLocation FROM farm_control_system_wfm w) as sys WHERE sys.farmId = ? ORDER BY sys.systemDistrict";
+		SQLQuery sqlQuery = session.createSQLQuery(sql);
+		sqlQuery.setParameter(0, farmId);
+		return sqlQuery.list();
+	}
+	
+	public List regionControlSystem(String farmId, String systemDistrict,
+			String systemLocation) {
+		Session session = getSession();
+		String sql = "SELECT sys.systemDistrict,sys.systemLocation,sys.systemId,sys.systemCode,sys.systemType,sys.systemTypeCode,sys.systemDescription,sys.systemNo FROM (SELECT c.farmId,c.systemDistrict,c.systemLocation,c.systemId," +
+				"c.systemCode,c.systemType,c.systemTypeCode,c.systemDescription,c.systemNo FROM farm_control_system c UNION ALL SELECT w.farmId,w.systemDistrict,w.systemLocation,w.systemId,w.systemCode,w.systemType,w.systemTypeCode,w.systemDescription,w.systemNo FROM farm_control_system_wfm w)" +
+				" as sys WHERE sys.farmId = ? AND sys.systemDistrict = ? AND sys.systemLocation = ? ORDER BY sys.systemDistrict";
+		SQLQuery sqlQuery = session.createSQLQuery(sql);
+		sqlQuery.setParameter(0, farmId);
+		sqlQuery.setParameter(1, systemDistrict);
+		sqlQuery.setParameter(2, systemLocation);
+		return sqlQuery.list();
 	}
 
 	/**

@@ -80,8 +80,13 @@ public class DeviceController {
 	}
 
 	@RequestMapping("collectorDevice/delete")
-	String collectorDeviceDelet(FarmCollectorDevice farmCollectorDevice) {
+	String collectorDeviceDelete(FarmCollectorDevice farmCollectorDevice) {
 		return farmCollectorDeviceService.deleteFarmCollectorDevice(farmCollectorDevice);
+	}
+	
+	@RequestMapping("collectorDevice/type")
+	String collectorDeviceType(String deviceCode) {
+		return CacheDataBase.initBaseConfig.get("deviceCategory.json").getJSONObject("deviceCode").getString(deviceCode);
 	}
 
 	@RequestMapping("controlDevice/delete")

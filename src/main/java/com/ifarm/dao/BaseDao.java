@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.DetachedCriteria;
@@ -15,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.ifarm.annotation.LikeField;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public abstract class BaseDao<T> {
 	private SessionFactory sessionFactory;
 
@@ -42,6 +43,17 @@ public abstract class BaseDao<T> {
 			session.evict(t);
 		}
 		return t;
+	}
+	
+	public T getTById(Object id, Class<T> tClass) {
+		if (id instanceof String) {
+			return getTById((String)id, tClass);
+		} else if (id instanceof Integer) {
+			return getTById((Integer)id, tClass);
+		} else if (id instanceof Long) {
+			return getTById((Long)id, tClass);
+		}
+		return null;
 	}
 
 	public T getTById(Integer id, Class<T> tClass) {
@@ -70,7 +82,8 @@ public abstract class BaseDao<T> {
 			fields[i].setAccessible(true);
 			try {
 				if (fields[i].get(t) != null) {
-					criteria.add(Restrictions.eq(fields[i].getName(), fields[i].get(t)));
+					criteria.add(Restrictions.eq(fields[i].getName(),
+							fields[i].get(t)));
 				}
 			} catch (IllegalArgumentException | IllegalAccessException e) {
 				// TODO Auto-generated catch block
@@ -97,11 +110,14 @@ public abstract class BaseDao<T> {
 			try {
 				if (fields[i].get(t) != null) {
 					String fieldName = fields[i].getName();
-					LikeField likeField = fields[i].getAnnotation(LikeField.class);
+					LikeField likeField = fields[i]
+							.getAnnotation(LikeField.class);
 					if (likeField != null) {
-						criteria.add(Restrictions.like(fieldName, "%" + fields[i].get(t) + "%"));
+						criteria.add(Restrictions.like(fieldName, "%"
+								+ fields[i].get(t) + "%"));
 					} else {
-						criteria.add(Restrictions.eq(fieldName, fields[i].get(t)));
+						criteria.add(Restrictions.eq(fieldName,
+								fields[i].get(t)));
 					}
 				}
 			} catch (IllegalArgumentException | IllegalAccessException e) {
@@ -123,7 +139,8 @@ public abstract class BaseDao<T> {
 	public boolean updateDynamic(T t) {
 		Session session = getSession();
 		String tableName = t.getClass().getSimpleName();
-		StringBuffer hqlBuffer = new StringBuffer("update " + tableName + " t set ");
+		StringBuffer hqlBuffer = new StringBuffer("update " + tableName
+				+ " t set ");
 		Field[] fields = t.getClass().getDeclaredFields();
 		try {
 			fields[0].setAccessible(true);
@@ -160,16 +177,10 @@ public abstract class BaseDao<T> {
 		}
 	}
 
-	public boolean saveBase(T t) {
-		try {
-			Session session = getSession();
-			session.save(t);
-		} catch (Exception e) {
-			// TODO: handle exception
-			LOGGER.error(t + "save error", e);
-			return false;
-		}
-		return true;
+	public void saveBase(T t) {
+		Session session = getSession();
+		session.save(t);
+
 	}
 
 	/**
@@ -180,5 +191,23 @@ public abstract class BaseDao<T> {
 	public void deleteBase(T t) {
 		Session session = getSession();
 		session.delete(t);
+	}
+
+	protected List getDynamicList(Object[] objects, String sql,
+			Object... valTitle) {
+		Session session = getSession();
+		for (int i = 0; i < objects.length; i++) {
+			if (objects[i] != null) {
+				sql += " AND " + valTitle[i] + "= ?";
+			}
+		}
+		SQLQuery sqlQuery = session.createSQLQuery(sql);
+		int initNum = 0;
+		for (int i = 0; i < objects.length; i++) {
+			if (objects[i] != null) {
+				sqlQuery.setParameter(initNum++, objects[i]);
+			}
+		}
+		return sqlQuery.list();
 	}
 }

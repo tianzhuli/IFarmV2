@@ -14,9 +14,9 @@ public class FarmControlTerminalDao extends BaseDao<FarmControlTerminal> {
 	
 	public List getFarmControlOperationList(FarmControlTerminal farmControlTerminal) {
 		Session session = getSession();
-		String sql = "SELECT t.functionName,t.functionCode FROM farm_control_terminal t WHERE t.systemId=?";
+		String sql = "SELECT t.functionName,t.functionCode FROM farm_control_terminal t WHERE t.unitId=?";
 		SQLQuery sqlQuery = session.createSQLQuery(sql);
-		sqlQuery.setParameter(0, farmControlTerminal.getSystemId());
+		sqlQuery.setParameter(0, farmControlTerminal.getUnitId());
 		return sqlQuery.list();
 	}
 	

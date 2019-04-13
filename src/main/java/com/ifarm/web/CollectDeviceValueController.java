@@ -7,8 +7,11 @@ import java.sql.Timestamp;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -21,32 +24,41 @@ import com.ifarm.service.CollectorDeviceValueService;
 public class CollectDeviceValueController {
 	@Autowired
 	private CollectorDeviceValueService collectorDeviceValueService;
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(CollectDeviceValueController.class);
 
 	@RequestMapping("collectorDeviceCurrentValue")
+	@CrossOrigin
 	public @ResponseBody
-	String getSensorVaules(FarmCollectorDevice fCollectorDevice) {
-		return collectorDeviceValueService.getCollectorDeviceValues(fCollectorDevice).toString();
+	String collectorDeviceCurrentValue(FarmCollectorDevice fCollectorDevice) {
+		String res = collectorDeviceValueService.getCollectorDeviceValues(fCollectorDevice).toString();
+		LOGGER.info(res);
+		return res;
 	}
 
 	@RequestMapping("collectorDeviceCacheVaules")
+	@CrossOrigin
 	public @ResponseBody
-	String getSensorCacheVaules(FarmCollectorDevice fCollectorDevice, String paramType) {
+	String collectorDeviceCacheVaules(FarmCollectorDevice fCollectorDevice, String paramType) {
 		return collectorDeviceValueService.getCollectorDeviceCacheValues(fCollectorDevice, paramType).toString();
 	}
 
 	@RequestMapping("collectorDeviceDistrict")
+	@CrossOrigin
 	public @ResponseBody
-	String sensorDistrict(FarmCollectorDevice fCollectorDevice) {
+	String collectorDeviceDistrict(FarmCollectorDevice fCollectorDevice) {
 		return collectorDeviceValueService.getSensorDistrict(fCollectorDevice).toString();
 	}
 
 	@RequestMapping("screenCollectorDeviceValueByDistrictOrType")
+	@CrossOrigin
 	public @ResponseBody
 	String screenCollectorDeviceValueByDistrictOrType(Integer farmId, String deviceDistrict, String deviceType) {
 		return collectorDeviceValueService.screenCollectorDeviceValueByDistrictOrType(farmId, deviceDistrict, deviceType).toString();
 	}
 
 	@RequestMapping("historyCollectorDeviceValues")
+	@CrossOrigin
 	public @ResponseBody
 	String historyCollectorDeviceValues(FarmCollectorDevice farmCollectorDevice, @RequestParam("beginTime") String beginTime,
 			@RequestParam("endTime") String endTime) {
@@ -55,6 +67,7 @@ public class CollectDeviceValueController {
 	}
 
 	@RequestMapping("historyCollectorDeviceExcel")
+	@CrossOrigin
 	public void historyCollectorDeviceExcel(FarmCollectorDevice fCollectorDevice, @RequestParam("beginTime") String beginTime,
 			@RequestParam("endTime") String endTime, HttpServletResponse response) throws IOException {
 		HSSFWorkbook workbook = collectorDeviceValueService.getHistorySensorValuesExcel(fCollectorDevice, Timestamp.valueOf(beginTime),

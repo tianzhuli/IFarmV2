@@ -8,8 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
+import com.ifarm.constant.SystemConfigCache;
 import com.ifarm.mina.CollectServer;
 import com.ifarm.mina.ControlServer;
+import com.ifarm.netty.NettyServer;
 import com.ifarm.nosql.dao.InitRedisDao;
 import com.ifarm.nosql.service.ControlSystemStateService;
 import com.ifarm.observer.UserControlData;
@@ -21,13 +23,16 @@ import com.ifarm.service.CollectorValueService;
 import com.ifarm.service.ControlTaskService;
 import com.ifarm.service.FarmControlSystemService;
 import com.ifarm.service.FarmControlSystemWFMService;
-import com.ifarm.service.WFMControlTaskService;
+import com.ifarm.service.FarmControlUnitService;
+import com.ifarm.service.MultiControlTaskService;
 import com.ifarm.util.CacheDataBase;
 import com.ifarm.util.ControlCacheCollection;
 
-public class InitializeProcessor implements ApplicationListener<ContextRefreshedEvent> {
+public class InitializeProcessor implements
+		ApplicationListener<ContextRefreshedEvent> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(InitializeProcessor.class);
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(InitializeProcessor.class);
 
 	@Autowired
 	private CollectorValueService collectorValuesService;
@@ -42,7 +47,7 @@ public class InitializeProcessor implements ApplicationListener<ContextRefreshed
 	private ControlTaskService taskService;
 
 	@Autowired
-	private WFMControlTaskService wService;
+	private MultiControlTaskService wService;
 
 	@Autowired
 	private ControlCacheCollection controlCacheCollection;
@@ -60,6 +65,9 @@ public class InitializeProcessor implements ApplicationListener<ContextRefreshed
 	private FarmControlSystemWFMService farmControlSystemWFMService;
 
 	@Autowired
+	private FarmControlUnitService farmControlUnitService;
+
+	@Autowired
 	private UserControlData userControlData;
 
 	@Autowired
@@ -67,6 +75,9 @@ public class InitializeProcessor implements ApplicationListener<ContextRefreshed
 
 	@Autowired
 	private ControlServer controlServer;
+
+	@Autowired
+	private NettyServer nettyServer;
 
 	@Autowired
 	private ControlCommandRedisHelper commandRedisHelper;
@@ -98,22 +109,23 @@ public class InitializeProcessor implements ApplicationListener<ContextRefreshed
 	public void init() {
 		try {
 			collectServer.start();
+			if ((boolean) CacheDataBase.systemConfigCacheMap
+					.get(SystemConfigCache.SWITCH_CHANNEL_TYPE)) {
+				nettyServer.init(CacheDataBase.controlPort);
+			} else {
+				controlServer.start();
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			LOGGER.error("init collect server error", e);
+			LOGGER.error("init server error", e);
 		}
-		try {
-			controlServer.start();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			LOGGER.error("init control server error", e);
-		}
-		CacheDataBase.sensorValuesService = sensorValuesService;
+		CacheDataBase.collectorDeviceValueService = sensorValuesService;
 		CacheDataBase.taskService = taskService;
 		CacheDataBase.initRedisDao = initRedisDao;
 		CacheDataBase.wTaskService = wService;
 		CacheDataBase.farmControlSystemService = farmControlSystemService;
 		CacheDataBase.farmControlSystemWFMService = farmControlSystemWFMService;
+		CacheDataBase.farmControlUnitService = farmControlUnitService;
 		if (CacheDataBase.userControlData == null) {
 			CacheDataBase.userControlData = userControlData;
 		}

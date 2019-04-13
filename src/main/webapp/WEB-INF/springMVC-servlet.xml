@@ -18,17 +18,25 @@
 	</bean>
 	<mvc:interceptors>
 		<mvc:interceptor>
+			<mvc:mapping path="/**"/>
+			<bean class = "com.ifarm.interceptor.FirstInterceptor"></bean>
+		</mvc:interceptor>
+		<mvc:interceptor>
 			<!-- 匹配的是url路径， 如果不配置或/**,将拦截所有的Controller -->
 			<mvc:mapping path="/user/**" />
 			<mvc:mapping path="/farm/**" />
 			<mvc:exclude-mapping path="/farm/manager/**" />
 			<mvc:exclude-mapping path="/user/getUserToken" />
 			<mvc:exclude-mapping path="/user/login" />
+			<mvc:exclude-mapping path="/user/register" />
+			<mvc:exclude-mapping path="/farm/region/**" />
+			<mvc:exclude-mapping path="/farm/position/**" />
 			<!-- <mvc:mapping path="/collectorValues/**" /> -->
 			<bean class="com.ifarm.interceptor.AuthInterceptor"></bean>
 		</mvc:interceptor>
 		<mvc:interceptor>
-			<mvc:mapping path="/farmControl/**" />
+			<!-- <mvc:mapping path="/farmControl/**" /> -->
+			<mvc:mapping path="/farmControlSystem/terminal/query" />
 			<mvc:exclude-mapping path="/farmControl/farmControlOperationList/**" />
 			<bean class="com.ifarm.interceptor.UserControlInterceptor"></bean>
 		</mvc:interceptor>
@@ -80,8 +88,5 @@
 		p:viewClass="org.springframework.web.servlet.view.JstlView" p:prefix="/"
 		p:suffix=".jsp">
 	</bean>
-
-
-
 </beans>
 

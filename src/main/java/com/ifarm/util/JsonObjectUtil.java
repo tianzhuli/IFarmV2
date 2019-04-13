@@ -13,12 +13,14 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ifarm.annotation.TransientField;
+import com.ifarm.enums.ServiceHeadEnum;
 
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class JsonObjectUtil {
 	private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static final Logger LOGGER = LoggerFactory.getLogger(JsonObjectUtil.class);
 
-	public static JSONObject toJsonObjectString(Object object) {
+	public static JSONObject toJsonObject(Object object) {
 		JSONObject jsonObject = new JSONObject();
 		if (object == null) {
 			Exception exception = new Exception();
@@ -62,10 +64,33 @@ public class JsonObjectUtil {
 				}
 				jsonArray.add(array);
 			} else {
-				jsonArray.add(toJsonObjectString(object));
+				jsonArray.add(toJsonObject(object));
 			}
 		}
 		return jsonArray.toJSONString();
+	}
+	
+	public static <T> JSONArray toJsonArray(List<T> list) {
+		JSONArray jsonArray = new JSONArray();
+		if (list != null && list.size() == 0) {
+			Exception exception = new Exception();
+			LOGGER.error("array error", exception);
+			return jsonArray;
+		}
+		for (int i = 0; i < list.size(); i++) {
+			Object object = list.get(i);
+			JSONArray array = new JSONArray();
+			if (object instanceof Object[]) {
+				Object[] arr = (Object[]) object;
+				for (int j = 0; j < arr.length; j++) {
+					array.add(arr[j].toString());
+				}
+				jsonArray.add(array);
+			} else {
+				jsonArray.add(toJsonObject(object));
+			}
+		}
+		return jsonArray;
 	}
 
 	public static <T> String toJsonArray(LinkedBlockingQueue<T> list) {
@@ -77,7 +102,7 @@ public class JsonObjectUtil {
 		}
 		Iterator<T> iterator = list.iterator();
 		while (iterator.hasNext()) {
-			jsonArray.add(toJsonObjectString(iterator.next()));
+			jsonArray.add(toJsonObject(iterator.next()));
 		}
 		return jsonArray.toString();
 	}
@@ -152,6 +177,33 @@ public class JsonObjectUtil {
 				e.printStackTrace();
 			}
 		}
+		return jsonObject;
+	}
+	
+	public static JSONObject buildCommandJsonObject(List list,
+			ServiceHeadEnum serviceHeadEnum) {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("title", serviceHeadEnum.getParam());
+		jsonObject.put("header", serviceHeadEnum.getParamCode());
+		jsonObject.put("data", toJsonArray(list));
+		return jsonObject;
+	}
+	
+	public static JSONObject buildCommandJsonObject(JSONArray jsonArray,
+			ServiceHeadEnum serviceHeadEnum) {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("title", serviceHeadEnum.getParam());
+		jsonObject.put("header", serviceHeadEnum.getParamCode());
+		jsonObject.put("data", jsonArray);
+		return jsonObject;
+	}
+	
+	public static JSONObject buildCommandJsonObject(Object object,
+			ServiceHeadEnum serviceHeadEnum) {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("title", serviceHeadEnum.getParam());
+		jsonObject.put("header", serviceHeadEnum.getParamCode());
+		jsonObject.put("data", toJsonObject(object));
 		return jsonObject;
 	}
 }

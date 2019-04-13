@@ -22,7 +22,7 @@ public class UserLogMongoService {
 	public void saveUserLog(HttpServletRequest request, Object object, String userId, String userOperateType, String userOperateObject, String returnMessage) {
 		UserLogMongo userLogMongo = new UserLogMongo();
 		userLogMongo.setUserIp(ClientIpUtil.getIpAddress(request));
-		userLogMongo.setRequestMessage(JsonObjectUtil.toJsonObjectString(object).toJSONString());
+		userLogMongo.setRequestMessage(JsonObjectUtil.toJsonObject(object).toJSONString());
 		userLogMongo.setUserId(userId);
 		userLogMongo.setReturnMessage(returnMessage);
 		userLogMongo.setUserOperateObject(userOperateObject);

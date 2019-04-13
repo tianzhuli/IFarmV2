@@ -2,7 +2,7 @@ package com.ifarm.observer;
 
 import org.apache.mina.core.session.IoSession;
 
-import com.ifarm.mina.ControlByteIoHandler;
+import com.ifarm.mina.IoControlHandler;
 
 public abstract class IoSessionSubjectDecorator implements Subject {
 	private Subject subject;
@@ -11,7 +11,7 @@ public abstract class IoSessionSubjectDecorator implements Subject {
 
 	protected abstract void registerObserver(String key, IoSessionObserver o);
 
-	protected abstract void removeObserver(ControlByteIoHandler ioHandler);
+	protected abstract void removeObserver(IoControlHandler ioHandler);
 
 	protected abstract void removeObserver(IoSession session);
 

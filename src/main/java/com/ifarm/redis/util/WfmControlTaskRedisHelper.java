@@ -6,10 +6,10 @@ import java.util.List;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.stereotype.Component;
 
-import com.ifarm.bean.WFMControlTask;
+import com.ifarm.bean.MultiControlTask;
 
 @Component
-public class WfmControlTaskRedisHelper extends BaseLockRedisHelper<Long, WFMControlTask> {
+public class WfmControlTaskRedisHelper extends BaseLockRedisHelper<Long, MultiControlTask> {
 
 	public WfmControlTaskRedisHelper() {
 		setRedisKeyName(RedisContstant.WFM_CONTROL_TASK_CACHE);
@@ -17,14 +17,14 @@ public class WfmControlTaskRedisHelper extends BaseLockRedisHelper<Long, WFMCont
 
 	public boolean removeWfmControlTask(String key, Integer controlTaskId) {
 		String redisKey = redisKeyName + key;
-		ListOperations<String, WFMControlTask> listOperations = valueRedisTemplate.opsForList();
+		ListOperations<String, MultiControlTask> listOperations = valueRedisTemplate.opsForList();
 		boolean removeFlat = false;
-		List<WFMControlTask> list = listOperations.range(redisKey, 0, listOperations.size(redisKey));
+		List<MultiControlTask> list = listOperations.range(redisKey, 0, listOperations.size(redisKey));
 		Object lock = getLock(key);
 		if (list != null && list.size() > 0) {
-			Iterator<WFMControlTask> iterator = list.iterator();
+			Iterator<MultiControlTask> iterator = list.iterator();
 			while (iterator.hasNext()) {
-				WFMControlTask task = iterator.next();
+				MultiControlTask task = iterator.next();
 				if (task.getControllerLogId().equals(controlTaskId)) {
 					iterator.remove();
 					removeFlat = true;
@@ -39,12 +39,12 @@ public class WfmControlTaskRedisHelper extends BaseLockRedisHelper<Long, WFMCont
 		return removeFlat;
 	}
 
-	public void updateControlTaskListValue(String key, WFMControlTask controlTask) {
+	public void updateControlTaskListValue(String key, MultiControlTask controlTask) {
 		Object lock = getLock(key);
 		synchronized (lock) {
-			List<WFMControlTask> list = getRedisListValues(key);
+			List<MultiControlTask> list = getRedisListValues(key);
 			for (int i = 0; i < list.size(); i++) {
-				WFMControlTask task = list.get(i);
+				MultiControlTask task = list.get(i);
 				if (controlTask.getControllerLogId().equals(task.getControllerLogId())) {
 					setRedisListIndexValue(key, controlTask, i);
 				}
@@ -52,11 +52,11 @@ public class WfmControlTaskRedisHelper extends BaseLockRedisHelper<Long, WFMCont
 		}
 	}
 
-	public WFMControlTask queryControlTask(String key, WFMControlTask controlTask) {
-		List<WFMControlTask> list = getRedisListValues(key);
+	public MultiControlTask queryControlTask(String key, MultiControlTask controlTask) {
+		List<MultiControlTask> list = getRedisListValues(key);
 		if (list != null) {
 			for (int i = 0; i < list.size(); i++) {
-				WFMControlTask task = list.get(i);
+				MultiControlTask task = list.get(i);
 				if (task.getControllerLogId().equals(controlTask.getControllerLogId())) {
 					return task;
 				}
@@ -65,11 +65,11 @@ public class WfmControlTaskRedisHelper extends BaseLockRedisHelper<Long, WFMCont
 		return controlTask;
 	}
 	
-	public WFMControlTask queryControlTask(String key, Integer taskId) {
-		List<WFMControlTask> list = getRedisListValues(key);
+	public MultiControlTask queryControlTask(String key, Integer taskId) {
+		List<MultiControlTask> list = getRedisListValues(key);
 		if (list != null) {
 			for (int i = 0; i < list.size(); i++) {
-				WFMControlTask task = list.get(i);
+				MultiControlTask task = list.get(i);
 				if (task.getControllerLogId().equals(taskId)) {
 					return task;
 				}

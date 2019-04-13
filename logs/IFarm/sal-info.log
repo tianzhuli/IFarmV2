@@ -1,0 +1,60 @@
+2019-01-31 13:00:02:099 [INFO ]: org.hibernate.Version - org.hibernate.Version.logVersion(Version.java:37) HHH000412: Hibernate Core {5.0.1.Final}
+2019-01-31 13:00:02:102 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.<clinit>(Environment.java:213) HHH000206: hibernate.properties not found
+2019-01-31 13:00:02:106 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.buildBytecodeProvider(Environment.java:317) HHH000021: Bytecode provider name : javassist
+2019-01-31 13:00:02:211 [INFO ]: org.hibernate.annotations.common.Version - org.hibernate.annotations.common.reflection.java.JavaReflectionManager.<clinit>(JavaReflectionManager.java:66) HCANN000001: Hibernate Commons Annotations {5.0.0.Final}
+2019-01-31 13:00:03:111 [INFO ]: org.hibernate.dialect.Dialect - org.hibernate.dialect.Dialect.<init>(Dialect.java:154) HHH000400: Using dialect: org.hibernate.dialect.MySQL5Dialect
+2019-01-31 13:04:01:991 [INFO ]: org.hibernate.Version - org.hibernate.Version.logVersion(Version.java:37) HHH000412: Hibernate Core {5.0.1.Final}
+2019-01-31 13:04:01:994 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.<clinit>(Environment.java:213) HHH000206: hibernate.properties not found
+2019-01-31 13:04:01:995 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.buildBytecodeProvider(Environment.java:317) HHH000021: Bytecode provider name : javassist
+2019-01-31 13:04:02:088 [INFO ]: org.hibernate.annotations.common.Version - org.hibernate.annotations.common.reflection.java.JavaReflectionManager.<clinit>(JavaReflectionManager.java:66) HCANN000001: Hibernate Commons Annotations {5.0.0.Final}
+2019-01-31 13:04:02:536 [INFO ]: org.hibernate.dialect.Dialect - org.hibernate.dialect.Dialect.<init>(Dialect.java:154) HHH000400: Using dialect: org.hibernate.dialect.MySQL5Dialect
+2019-01-31 13:05:05:169 [INFO ]: org.hibernate.Version - org.hibernate.Version.logVersion(Version.java:37) HHH000412: Hibernate Core {5.0.1.Final}
+2019-01-31 13:05:05:173 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.<clinit>(Environment.java:213) HHH000206: hibernate.properties not found
+2019-01-31 13:05:05:174 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.buildBytecodeProvider(Environment.java:317) HHH000021: Bytecode provider name : javassist
+2019-01-31 13:05:05:223 [INFO ]: org.hibernate.annotations.common.Version - org.hibernate.annotations.common.reflection.java.JavaReflectionManager.<clinit>(JavaReflectionManager.java:66) HCANN000001: Hibernate Commons Annotations {5.0.0.Final}
+2019-01-31 13:05:05:583 [INFO ]: org.hibernate.dialect.Dialect - org.hibernate.dialect.Dialect.<init>(Dialect.java:154) HHH000400: Using dialect: org.hibernate.dialect.MySQL5Dialect
+2019-01-31 13:25:20:947 [INFO ]: org.hibernate.Version - org.hibernate.Version.logVersion(Version.java:37) HHH000412: Hibernate Core {5.0.1.Final}
+2019-01-31 13:25:20:950 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.<clinit>(Environment.java:213) HHH000206: hibernate.properties not found
+2019-01-31 13:25:20:953 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.buildBytecodeProvider(Environment.java:317) HHH000021: Bytecode provider name : javassist
+2019-01-31 13:25:21:001 [INFO ]: org.hibernate.annotations.common.Version - org.hibernate.annotations.common.reflection.java.JavaReflectionManager.<clinit>(JavaReflectionManager.java:66) HCANN000001: Hibernate Commons Annotations {5.0.0.Final}
+2019-01-31 13:25:21:294 [INFO ]: org.hibernate.dialect.Dialect - org.hibernate.dialect.Dialect.<init>(Dialect.java:154) HHH000400: Using dialect: org.hibernate.dialect.MySQL5Dialect
+2019-01-31 13:30:18:834 [INFO ]: org.hibernate.Version - org.hibernate.Version.logVersion(Version.java:37) HHH000412: Hibernate Core {5.0.1.Final}
+2019-01-31 13:30:18:835 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.<clinit>(Environment.java:213) HHH000206: hibernate.properties not found
+2019-01-31 13:30:18:836 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.buildBytecodeProvider(Environment.java:317) HHH000021: Bytecode provider name : javassist
+2019-01-31 13:30:18:884 [INFO ]: org.hibernate.annotations.common.Version - org.hibernate.annotations.common.reflection.java.JavaReflectionManager.<clinit>(JavaReflectionManager.java:66) HCANN000001: Hibernate Commons Annotations {5.0.0.Final}
+2019-01-31 13:30:19:318 [INFO ]: org.hibernate.dialect.Dialect - org.hibernate.dialect.Dialect.<init>(Dialect.java:154) HHH000400: Using dialect: org.hibernate.dialect.MySQL5Dialect
+2019-01-31 13:31:56:456 [INFO ]: org.hibernate.Version - org.hibernate.Version.logVersion(Version.java:37) HHH000412: Hibernate Core {5.0.1.Final}
+2019-01-31 13:31:56:457 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.<clinit>(Environment.java:213) HHH000206: hibernate.properties not found
+2019-01-31 13:31:56:458 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.buildBytecodeProvider(Environment.java:317) HHH000021: Bytecode provider name : javassist
+2019-01-31 13:31:56:532 [INFO ]: org.hibernate.annotations.common.Version - org.hibernate.annotations.common.reflection.java.JavaReflectionManager.<clinit>(JavaReflectionManager.java:66) HCANN000001: Hibernate Commons Annotations {5.0.0.Final}
+2019-01-31 13:31:56:927 [INFO ]: org.hibernate.dialect.Dialect - org.hibernate.dialect.Dialect.<init>(Dialect.java:154) HHH000400: Using dialect: org.hibernate.dialect.MySQL5Dialect
+2019-01-31 13:33:13:801 [INFO ]: org.hibernate.Version - org.hibernate.Version.logVersion(Version.java:37) HHH000412: Hibernate Core {5.0.1.Final}
+2019-01-31 13:33:15:480 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.<clinit>(Environment.java:213) HHH000206: hibernate.properties not found
+2019-01-31 13:33:15:490 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.buildBytecodeProvider(Environment.java:317) HHH000021: Bytecode provider name : javassist
+2019-01-31 13:33:17:628 [INFO ]: org.hibernate.annotations.common.Version - org.hibernate.annotations.common.reflection.java.JavaReflectionManager.<clinit>(JavaReflectionManager.java:66) HCANN000001: Hibernate Commons Annotations {5.0.0.Final}
+2019-01-31 13:33:19:994 [INFO ]: org.hibernate.dialect.Dialect - org.hibernate.dialect.Dialect.<init>(Dialect.java:154) HHH000400: Using dialect: org.hibernate.dialect.MySQL5Dialect
+2019-01-31 13:35:14:464 [INFO ]: org.hibernate.Version - org.hibernate.Version.logVersion(Version.java:37) HHH000412: Hibernate Core {5.0.1.Final}
+2019-01-31 13:35:14:466 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.<clinit>(Environment.java:213) HHH000206: hibernate.properties not found
+2019-01-31 13:35:14:467 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.buildBytecodeProvider(Environment.java:317) HHH000021: Bytecode provider name : javassist
+2019-01-31 13:35:14:510 [INFO ]: org.hibernate.annotations.common.Version - org.hibernate.annotations.common.reflection.java.JavaReflectionManager.<clinit>(JavaReflectionManager.java:66) HCANN000001: Hibernate Commons Annotations {5.0.0.Final}
+2019-01-31 13:35:14:919 [INFO ]: org.hibernate.dialect.Dialect - org.hibernate.dialect.Dialect.<init>(Dialect.java:154) HHH000400: Using dialect: org.hibernate.dialect.MySQL5Dialect
+2019-01-31 13:35:43:265 [INFO ]: org.hibernate.Version - org.hibernate.Version.logVersion(Version.java:37) HHH000412: Hibernate Core {5.0.1.Final}
+2019-01-31 13:35:43:266 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.<clinit>(Environment.java:213) HHH000206: hibernate.properties not found
+2019-01-31 13:35:43:267 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.buildBytecodeProvider(Environment.java:317) HHH000021: Bytecode provider name : javassist
+2019-01-31 13:35:43:311 [INFO ]: org.hibernate.annotations.common.Version - org.hibernate.annotations.common.reflection.java.JavaReflectionManager.<clinit>(JavaReflectionManager.java:66) HCANN000001: Hibernate Commons Annotations {5.0.0.Final}
+2019-01-31 13:35:43:704 [INFO ]: org.hibernate.dialect.Dialect - org.hibernate.dialect.Dialect.<init>(Dialect.java:154) HHH000400: Using dialect: org.hibernate.dialect.MySQL5Dialect
+2019-01-31 13:36:17:856 [INFO ]: org.hibernate.Version - org.hibernate.Version.logVersion(Version.java:37) HHH000412: Hibernate Core {5.0.1.Final}
+2019-01-31 13:36:17:860 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.<clinit>(Environment.java:213) HHH000206: hibernate.properties not found
+2019-01-31 13:36:17:863 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.buildBytecodeProvider(Environment.java:317) HHH000021: Bytecode provider name : javassist
+2019-01-31 13:36:18:023 [INFO ]: org.hibernate.annotations.common.Version - org.hibernate.annotations.common.reflection.java.JavaReflectionManager.<clinit>(JavaReflectionManager.java:66) HCANN000001: Hibernate Commons Annotations {5.0.0.Final}
+2019-01-31 13:36:18:329 [INFO ]: org.hibernate.dialect.Dialect - org.hibernate.dialect.Dialect.<init>(Dialect.java:154) HHH000400: Using dialect: org.hibernate.dialect.MySQL5Dialect
+2019-01-31 13:38:36:622 [INFO ]: org.hibernate.Version - org.hibernate.Version.logVersion(Version.java:37) HHH000412: Hibernate Core {5.0.1.Final}
+2019-01-31 13:38:36:623 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.<clinit>(Environment.java:213) HHH000206: hibernate.properties not found
+2019-01-31 13:38:36:624 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.buildBytecodeProvider(Environment.java:317) HHH000021: Bytecode provider name : javassist
+2019-01-31 13:38:36:671 [INFO ]: org.hibernate.annotations.common.Version - org.hibernate.annotations.common.reflection.java.JavaReflectionManager.<clinit>(JavaReflectionManager.java:66) HCANN000001: Hibernate Commons Annotations {5.0.0.Final}
+2019-01-31 13:38:37:049 [INFO ]: org.hibernate.dialect.Dialect - org.hibernate.dialect.Dialect.<init>(Dialect.java:154) HHH000400: Using dialect: org.hibernate.dialect.MySQL5Dialect
+2019-01-31 14:24:45:986 [INFO ]: org.hibernate.Version - org.hibernate.Version.logVersion(Version.java:37) HHH000412: Hibernate Core {5.0.1.Final}
+2019-01-31 14:24:45:988 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.<clinit>(Environment.java:213) HHH000206: hibernate.properties not found
+2019-01-31 14:24:45:989 [INFO ]: org.hibernate.cfg.Environment - org.hibernate.cfg.Environment.buildBytecodeProvider(Environment.java:317) HHH000021: Bytecode provider name : javassist
+2019-01-31 14:24:46:060 [INFO ]: org.hibernate.annotations.common.Version - org.hibernate.annotations.common.reflection.java.JavaReflectionManager.<clinit>(JavaReflectionManager.java:66) HCANN000001: Hibernate Commons Annotations {5.0.0.Final}
+2019-01-31 14:24:46:412 [INFO ]: org.hibernate.dialect.Dialect - org.hibernate.dialect.Dialect.<init>(Dialect.java:154) HHH000400: Using dialect: org.hibernate.dialect.MySQL5Dialect

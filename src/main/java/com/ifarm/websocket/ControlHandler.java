@@ -18,8 +18,9 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.ifarm.bean.ControlTask;
-import com.ifarm.bean.WFMControlTask;
-import com.ifarm.constant.ControlTaskEnum;
+import com.ifarm.bean.MultiControlTask;
+import com.ifarm.enums.ControlSystemEnum;
+import com.ifarm.enums.SystemReturnCodeEnum;
 import com.ifarm.nosql.service.CombinationControlTaskService;
 import com.ifarm.observer.UserControlData;
 import com.ifarm.observer.WebSocketObserver;
@@ -29,10 +30,14 @@ import com.ifarm.util.CacheDataBase;
 import com.ifarm.util.Constants;
 import com.ifarm.util.ControlHandlerUtil;
 import com.ifarm.util.ControlTaskUtil;
+import com.ifarm.util.EventContext;
+import com.ifarm.util.SystemResultEncapsulation;
 
 @Component
-public class ControlHandler extends TextWebSocketHandler implements WebSocketObserver {
-	private static final Logger controlHandler_log = LoggerFactory.getLogger(ControlHandler.class);
+public class ControlHandler extends TextWebSocketHandler implements
+		WebSocketObserver {
+	private static final Logger controlHandler_log = LoggerFactory
+			.getLogger(ControlHandler.class);
 	private FarmControlSystemService farmControlSystemService;
 	private CombinationControlTaskService combinationControlTaskService;
 
@@ -47,12 +52,14 @@ public class ControlHandler extends TextWebSocketHandler implements WebSocketObs
 	}
 
 	@Autowired
-	public void setCombinationControlTaskService(CombinationControlTaskService combinationControlTaskService) {
+	public void setCombinationControlTaskService(
+			CombinationControlTaskService combinationControlTaskService) {
 		this.combinationControlTaskService = combinationControlTaskService;
 	}
 
 	@Autowired
-	public void setFarmControlSystemService(FarmControlSystemService farmControlSystemService) {
+	public void setFarmControlSystemService(
+			FarmControlSystemService farmControlSystemService) {
 		this.farmControlSystemService = farmControlSystemService;
 	}
 
@@ -61,7 +68,8 @@ public class ControlHandler extends TextWebSocketHandler implements WebSocketObs
 		if (CacheDataBase.userControlData == null) {
 			CacheDataBase.userControlData = userControlData;
 		}
-		CacheDataBase.userControlData.registerObserver(Constants.userControlHandler, this);
+		CacheDataBase.userControlData.registerObserver(
+				Constants.userControlHandler, this);
 	}
 
 	public FarmControlSystemService getFarmControlSystemService() {
@@ -81,7 +89,8 @@ public class ControlHandler extends TextWebSocketHandler implements WebSocketObs
 	}
 
 	@Override
-	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+	public void afterConnectionEstablished(WebSocketSession session)
+			throws Exception {
 		// TODO Auto-generated method stub
 		controlHandler_log.info(session + "建立连接");
 		if (!(boolean) session.getAttributes().get("authState")) {
@@ -89,7 +98,8 @@ public class ControlHandler extends TextWebSocketHandler implements WebSocketObs
 			// session.close();
 		} else {
 			String userId = (String) session.getAttributes().get("userId");
-			List<String> list = userRedisUtil.getUserControlResultMessageCache(userId);
+			List<String> list = userRedisUtil
+					.getUserControlResultMessageCache(userId);
 			for (int i = 0; i < list.size(); i++) {
 				session.sendMessage(new TextMessage(list.get(i)));
 			}
@@ -97,96 +107,104 @@ public class ControlHandler extends TextWebSocketHandler implements WebSocketObs
 	}
 
 	public boolean authorityManager(JSONObject jsonObject, String userId) {
-		if (!jsonObject.containsKey("systemId") || !jsonObject.containsKey("farmId")) {
+		if (!jsonObject.containsKey("systemId")
+				|| !jsonObject.containsKey("farmId")) {
 			return false;
 		}
 		Integer systemId = jsonObject.getInteger("systemId");
 		Integer farmId = jsonObject.getInteger("farmId");
-		return farmControlSystemService.farmControlSystemVerification(userId, farmId, systemId);
+		return farmControlSystemService.farmControlSystemVerification(userId,
+				farmId, systemId);
 	}
 
 	@Override
-	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+	protected void handleTextMessage(WebSocketSession session,
+			TextMessage message) throws Exception {
 		String messgaeDetail = message.getPayload();
 		controlHandler_log.info("receive:" + messgaeDetail);
 		JSONObject messageJson = null;
-		JSONObject resultJson = new JSONObject();
 		String userId = (String) session.getAttributes().get("userId");
+		String sendMessage = null;
+		EventContext eventContext = new EventContext();
 		try {
 			messageJson = JSONObject.parseObject(messgaeDetail);
-			// 权限验证
-			/*
-			 * boolean flag = authorityManager(messageJson, userId); if (!flag)
-			 * { session.sendMessage(new TextMessage("no_auth")); return; }
-			 */
-			resultJson = controlHandler(userId, session, messageJson);
+			controlHandler(userId, session, messageJson, eventContext);
+			if (eventContext.getEvent() != null) {
+				sendMessage = (String) eventContext.getEvent();
+			} else {
+				sendMessage = SystemResultEncapsulation
+						.fillResultCode(SystemReturnCodeEnum.SUCCESS);
+			}
 		} catch (JSONException je) {
 			if (messgaeDetail.contains("[")) {
-				JSONArray resultArray = new JSONArray();
 				try {
-					JSONArray jsonArray = JSONArray.parseArray(message.getPayload());
+					JSONArray jsonArray = JSONArray.parseArray(message
+							.getPayload());
 					for (int i = 0; i < jsonArray.size(); i++) {
 						JSONObject jsonObject = jsonArray.getJSONObject(i);
-						resultJson = controlHandler(userId, session, jsonObject);
-						resultArray.add(resultJson);
+						controlHandler(userId, session, jsonObject,
+								eventContext);
 					}
 					// 历史配置信息存在mongo
-					combinationControlTaskService.saveCombinationControlTask(jsonArray, userId);
+					combinationControlTaskService.saveCombinationControlTask(
+							jsonArray, userId);
+					sendMessage = SystemResultEncapsulation
+							.fillResultCode(SystemReturnCodeEnum.SUCCESS);
 				} catch (Exception e) {
 					// TODO: handle exception
-					controlHandler_log.error(e.toString());
-					resultJson.put("response", ControlTaskEnum.ERROR);
-					resultArray.add(resultJson);
+					controlHandler_log.error("组合任务失败", e);
 				}
-				session.sendMessage(new TextMessage(resultArray.toString()));
-				return;
 			} else {
-				controlHandler_log.error(je.toString());
-				resultJson.put("response", ControlTaskEnum.ERROR);
+				controlHandler_log.error("json parse error", je);
+				sendMessage = SystemResultEncapsulation.fillErrorCode(je);
 			}
 		} catch (Exception e) {
-			controlHandler_log.error(e.toString());
-			resultJson.put("response", ControlTaskEnum.ERROR);
+			controlHandler_log.error("添加任务异常", e);
+			sendMessage = SystemResultEncapsulation.fillErrorCode(e);
 		}
-		session.sendMessage(new TextMessage(resultJson.toString()));
+		session.sendMessage(new TextMessage(sendMessage));
 	}
 
-	public JSONObject controlHandler(String userId, WebSocketSession session, JSONObject messageJson) throws Exception {
+	public void controlHandler(String userId, WebSocketSession session,
+			JSONObject messageJson, EventContext eventContext) throws Exception {
 		// 替换之前用户的session
-		JSONObject resultJson = new JSONObject();
 		CacheDataBase.userControlData.registerObserver(userId, session);
 		String command = messageJson.getString("command");
 		if ("execute".equals(command)) {
-			try {
-				String controlType = messageJson.getString("controlType");
-				if ("wfm".equals(controlType)) {
-					WFMControlTask wfmControlTask = ControlTaskUtil.fromJson(messageJson);
-					wfmControlTask.setUserId(userId);
-					resultJson = ControlHandlerUtil.wfmHandlerControlMessage(wfmControlTask, userId, farmControlSystemService);
-				} else {
-					ControlTask controlTask = ControlTaskUtil.fromJsonTotask(messageJson);
-					controlTask.setUserId(userId);
-					resultJson = ControlHandlerUtil.handlerControlMessage(controlTask, userId, farmControlSystemService);
-				}
-			} catch (Exception e) {
-				controlHandler_log.error("control handler", e);
-				resultJson.put("response", ControlTaskEnum.ERROR);
+			String controlType = messageJson.getString("controlType");
+			ControlSystemEnum systemEnum = ControlSystemEnum.getValueByType(controlType);
+			if (systemEnum == null) {
+				throw new Exception("controlType no exist");
+			}
+			if (ControlSystemEnum.WATER_FERTILIZER_MEDICINDE.equals(systemEnum)) {
+				MultiControlTask wfmControlTask = ControlTaskUtil
+						.fromJson(messageJson);
+				wfmControlTask.setUserId(userId);
+				ControlHandlerUtil.mHandlerControlMessage(wfmControlTask,
+						userId, farmControlSystemService, eventContext);
+			} else {
+				ControlTask controlTask = ControlTaskUtil
+						.fromJsonTotask(messageJson);
+				controlTask.setUserId(userId);
+				ControlHandlerUtil.handlerControlMessage(controlTask, userId,
+						farmControlSystemService, eventContext);
 			}
 		}
-		return resultJson;
 	}
 
 	@Override
-	public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
+	public void handleTransportError(WebSocketSession session,
+			Throwable exception) throws Exception {
 		CacheDataBase.userControlData.removeObserver(session);
-		if (exception.getMessage().equals("java.io.EOFException")) {
-			controlHandler_log.error("java.io.EOFException");
+		if ("java.io.EOFException".equals(exception.toString())) {
+			return;
 		}
 		controlHandler_log.error("handleTransportError", exception);
 	}
 
 	@Override
-	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+	public void afterConnectionClosed(WebSocketSession session,
+			CloseStatus status) throws Exception {
 		controlHandler_log.info(session + ":连接关闭");
 		CacheDataBase.userControlData.removeObserver(session);
 	}

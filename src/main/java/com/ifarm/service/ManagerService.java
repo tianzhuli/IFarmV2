@@ -4,8 +4,8 @@ import java.lang.reflect.Field;
 import java.util.UUID;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +25,8 @@ public class ManagerService {
 	@Autowired
 	private ManagerTokenDao managerTokenDao;
 
-	private static final Log managerService_log = LogFactory.getLog(ManagerService.class);
+	private static final Logger managerService_log = LoggerFactory.getLogger(ManagerService.class);
+	private static final String SUPER_ADMIN = "admin";
 
 	public String getAllManager() {
 		return JsonObjectUtil.toJsonArrayString(managerDao.getAllManager());
@@ -87,7 +88,11 @@ public class ManagerService {
 				String token = managerGetSignature(manager.getManagerId());
 				mToken.setToken(token);
 				managerTokenDao.saveManagerToken(mToken);
-				return SystemResultEncapsulation.resultTokenDecorate(SystemResultCodeEnum.SUCCESS, token);
+				Manager realManager = managerDao.getTById(manager.getManagerId(), Manager.class);
+				if (SUPER_ADMIN.equals(realManager.getRoler()) || realManager.getRoler().equals(manager.getRoler())) {
+					return SystemResultEncapsulation.resultTokenDecorate(SystemResultCodeEnum.SUCCESS, token);
+				}
+				return SystemResultEncapsulation.resultTokenDecorate(SystemResultCodeEnum.AUTH_ERROR, token);
 			} else {
 				return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.ERROR);
 			}

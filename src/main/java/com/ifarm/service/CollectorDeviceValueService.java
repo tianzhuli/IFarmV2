@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,9 +24,9 @@ import com.ifarm.bean.FarmCollectorDevice;
 import com.ifarm.dao.CollectorDeviceValueDao;
 import com.ifarm.dao.DeviceHistoryValuesDao;
 import com.ifarm.dao.FarmCollectorDeviceDao;
+import com.ifarm.enums.DeviceValueType;
 import com.ifarm.log.RedisLog;
 import com.ifarm.redis.util.CollectorDeviceValueRedisUtil;
-import com.ifarm.util.CacheDataBase;
 import com.ifarm.util.CreateExcel;
 import com.ifarm.util.JsonObjectUtil;
 
@@ -45,95 +46,105 @@ public class CollectorDeviceValueService {
 
 	@Autowired
 	private FarmCollectorDeviceService farmCollectorDeviceService;
-	
+
 	@Autowired
 	private CollectorDeviceValueRedisUtil collectorDeviceValueRedisUtil;
-	
+
 	private SimpleDateFormat dFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(CollectorValueService.class);
-	
+
 	public void saveCollectorDeviceValues(DeviceValueBase collectorDeviceValue) {
 		collectorDeviceValue.setUpdateTime(Timestamp.valueOf(dFormat.format(new Date())));
-		collectorDeviceValueDao.saveBase(collectorDeviceValue);
 		try {
-			cDeviceRedisUtil.saveCollectorDeviceValue(fCollectorDeviceDao.getTById(collectorDeviceValue.getDeviceId(), FarmCollectorDevice.class)
-					.getFarmId(), collectorDeviceValue.getDeviceId(), collectorDeviceValue);
+			collectorDeviceValueDao.saveBase(collectorDeviceValue);
+			FarmCollectorDevice farmCollectorDevice = fCollectorDeviceDao.getTById(collectorDeviceValue.getDeviceId(), FarmCollectorDevice.class);
+			if (farmCollectorDevice != null) {
+				cDeviceRedisUtil.saveCollectorDeviceValue(farmCollectorDevice.getFarmId(), collectorDeviceValue.getDeviceId(), collectorDeviceValue);
+			} else {
+				LOGGER.error("{} is no exist", collectorDeviceValue);
+			}
 		} catch (Exception e) {
 			// TODO: handle exception
-			RedisLog.COLLECTOR_DEVICE_VALUE_LOG.error(e.toString());
+			RedisLog.COLLECTOR_DEVICE_VALUE_LOG.error("saveCollectorDeviceValues error", e);
 		}
+	}
+
+	public JSONArray fillCollectorDevice(JSONArray array,DeviceValueBase deviceValue,Long deviceId, FarmCollectorDevice farmCollectorDevice) {
+		JSONObject deviceValueJsonObject = JsonObjectUtil.fromBean(deviceValue);
+		if (deviceValueJsonObject == null) {
+			deviceValueJsonObject = new JSONObject();
+			deviceValueJsonObject.put("deviceId", deviceId);
+		}
+		packagingDeviceDetail(deviceValueJsonObject, farmCollectorDevice);
+		array.add(deviceValueJsonObject);
+		return array;
 	}
 
 	public JSONArray getCollectorDeviceValues(FarmCollectorDevice fDevice) {
 		JSONArray collectorDeviceValueArray = new JSONArray();
 		Long deviceId = fDevice.getDeviceId();
 		Integer farmId = fDevice.getFarmId();
-		if (deviceId != null) {
-			FarmCollectorDevice currentDevice = fCollectorDeviceDao.getTById(deviceId, FarmCollectorDevice.class);
-			//DeviceValueBase deviceValue = CacheDataBase.collectorDeviceMainValueMap.get(deviceId);
-			DeviceValueBase deviceValue = collectorDeviceValueRedisUtil.getCollectorDeviceValue(currentDevice.getFarmId(), deviceId);
-			FarmCollectorDevice farmCollectorDevice = fCollectorDeviceDao.getTById(deviceId, FarmCollectorDevice.class);
-			if (farmCollectorDevice == null) {
-				return collectorDeviceValueArray;
-			}
-			JSONObject jsonObject = new JSONObject();
-			JSONObject deviceValueJsonObject = JsonObjectUtil.fromBean(deviceValue);
-			if (deviceValueJsonObject == null) {
-				deviceValueJsonObject = new JSONObject();
-				deviceValueJsonObject.put("deviceId", deviceId);
-			}
-			packagingDeviceDetail(deviceValueJsonObject, farmCollectorDevice);
-			JSONArray array = new JSONArray();
-			array.add(deviceValueJsonObject);
-			packagingDeviceValue(jsonObject, array, farmCollectorDevice.getDeviceType());
-			collectorDeviceValueArray.add(jsonObject);
-		} else if (deviceId == null && farmId != null) {
-				Map<String, JSONArray> map = farmCollectorDeviceService.queryCollectorDeviceType(fDevice.getFarmId());
-				for (Entry<String, JSONArray> entry : map.entrySet()) {
+		try {
+			if (deviceId != null) {
+				FarmCollectorDevice farmCollectorDevice = fCollectorDeviceDao.getTById(deviceId, FarmCollectorDevice.class);
+				if (farmCollectorDevice == null) {
+					return collectorDeviceValueArray;
+				}
+				DeviceValueBase deviceValue = collectorDeviceValueRedisUtil.getCollectorDeviceValue(farmCollectorDevice.getFarmId(), deviceId);
+				if (deviceValue == null) {
+					LOGGER.info("device={} is no deviceValue", farmCollectorDevice);
+					return collectorDeviceValueArray;
+				}
+				JSONObject jsonObject = new JSONObject();
+				JSONArray array = new JSONArray();
+				fillCollectorDevice(array,deviceValue, deviceId, farmCollectorDevice);
+				packagingDeviceValue(jsonObject, array, deviceValue.getDeviceValueTyle());
+				collectorDeviceValueArray.add(jsonObject);
+			} else if (deviceId == null && farmId != null) {
+				List<FarmCollectorDevice> farmCollectorDevices = farmCollectorDeviceService.queryFarmCollectorDeviceList(fDevice);
+				Map<String, JSONArray> collectorDeviceTypeMap = new HashMap<String, JSONArray>();
+				for (int i = 0; i < farmCollectorDevices.size(); i++) {
+					FarmCollectorDevice farmCollectorDevice = farmCollectorDevices.get(i);
+					Long newDeviceId = farmCollectorDevice.getDeviceId();
+					DeviceValueBase deviceValueBase = collectorDeviceValueRedisUtil.getCollectorDeviceValue(farmId, newDeviceId);
+					if (deviceValueBase != null) {
+						String deviceValueType = deviceValueBase.getDeviceValueTyle().getCode();
+						if (!collectorDeviceTypeMap.containsKey(deviceValueType)) {
+							collectorDeviceTypeMap.put(deviceValueType, new JSONArray());
+						}
+						fillCollectorDevice(collectorDeviceTypeMap.get(deviceValueType), deviceValueBase, newDeviceId, farmCollectorDevice);
+					}
+				}
+				for (Entry<String, JSONArray> entry : collectorDeviceTypeMap.entrySet()) {
 					JSONObject jsonObject = new JSONObject();
 					String type = entry.getKey();
-					JSONArray array = entry.getValue();
-					JSONArray dataArray = new JSONArray();
-					Long deviceNo = null;
-					for (int i = 0; i < array.size(); i++) {
-						JSONObject json = array.getJSONObject(i);
-						deviceNo = json.getLong("deviceId");
-						if (deviceNo != null) {
-							//JSONObject deviceValueJsonObject = JsonObjectUtil.fromBean(CacheDataBase.collectorDeviceMainValueMap.get(deviceNo));
-							JSONObject deviceValueJsonObject = JsonObjectUtil.fromBean(collectorDeviceValueRedisUtil.getCollectorDeviceValue(farmId, deviceNo));
-							FarmCollectorDevice farmCollectorDevice = fCollectorDeviceDao.getTById(deviceNo, FarmCollectorDevice.class);
-							if (farmCollectorDevice == null) {
-								continue;
-							}
-							if (deviceValueJsonObject == null) {
-								deviceValueJsonObject = new JSONObject();
-							}
-							deviceValueJsonObject.put("deviceId", deviceNo);
-							packagingDeviceDetail(deviceValueJsonObject, farmCollectorDevice);
-							dataArray.add(deviceValueJsonObject);
-						}
-					}
-					packagingDeviceValue(jsonObject, dataArray, type);
+					JSONArray dataArray = entry.getValue();
+					packagingDeviceValue(jsonObject, dataArray, DeviceValueType.getValueTypeByCode(type));
 					collectorDeviceValueArray.add(jsonObject);
 				}
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.error("collector value error", e);
 		}
+
 		return collectorDeviceValueArray;
 	}
 
 	public JSONObject getCollectorDeviceCacheValues(FarmCollectorDevice fDevice, String paramType) {
 		JSONObject jsonObject = new JSONObject();
 		Long deviceId = fDevice.getDeviceId();
-		String deviceType = fCollectorDeviceDao.getTById(deviceId, FarmCollectorDevice.class).getDeviceType();
 		if (deviceId != null) {
-			//List<DeviceValueBase> list = CacheDataBase.collcetorDeviceMainValueCacheMap.get(deviceId);
 			List<DeviceValueBase> deviceValueBases = collectorDeviceValueRedisUtil.getCollectorDeviceCacheValue(deviceId);
 			if (deviceValueBases != null) {
 				int size = deviceValueBases.size();
 				ArrayList<Double> values = new ArrayList<>();
 				ArrayList<String> times = new ArrayList<>();
+				DeviceValueType deviceType = null;
 				for (int i = 0; i < size; i++) {
 					DeviceValueBase dValue = deviceValueBases.get(i);
+					deviceType = dValue.getDeviceValueTyle();
 					try {
 						values.add(dValue.getDynamicParamValue(paramType));
 					} catch (Exception e) {
@@ -150,15 +161,14 @@ public class CollectorDeviceValueService {
 		return jsonObject;
 	}
 
-	public String getCollectDeviceUnit(String deviceType, String paramType) {
-		if (CacheDataBase.collectorDeviceUnit.containsKey(paramType)) {
-			return CacheDataBase.collectorDeviceUnit.get(paramType);
+	public String getCollectDeviceUnit(DeviceValueType deviceValueType, String paramType) {
+		if (deviceValueType == null) {
+			return "";
 		}
-		String[] params = CacheDataBase.collectorDeviceTitle.get(deviceType + "UpperCode").split(",");
-		String[] units = CacheDataBase.collectorDeviceTitle.get(deviceType + "Unit").split(",");
-		for (int i = 0; i < params.length; i++) {
-			if (paramType.equals(params[i])) {
-				CacheDataBase.collectorDeviceUnit.put(paramType, units[i]);
+		String[] paramCode = deviceValueType.getParamCode().split(",");
+		String[] units = deviceValueType.getParamUnit().split(",");
+		for (int i = 0; i < units.length; i++) {
+			if (paramCode[i].equals(paramType)) {
 				return units[i];
 			}
 		}
@@ -167,17 +177,17 @@ public class CollectorDeviceValueService {
 
 	public JSONArray screenCollectorDeviceValueByDistrictOrType(Integer farmId, String deviceDistrict, String deviceType) {
 		JSONArray collectorDeviceValueArray = new JSONArray();
-			Map<String, JSONArray> map = farmCollectorDeviceService.queryCollectorDeviceDistrict(farmId);
-			if (deviceType != null) {
-				JSONArray array = map.get(deviceType);
-				analysisCollectorTypeAndAddtion(array, deviceDistrict, deviceType, collectorDeviceValueArray);
-			} else {
-				for (Entry<String, JSONArray> entry : map.entrySet()) {
-					String type = entry.getKey();
-					JSONArray array = entry.getValue();
-					analysisCollectorTypeAndAddtion(array, deviceDistrict, type, collectorDeviceValueArray);
-				}
+		Map<String, JSONArray> map = farmCollectorDeviceService.queryCollectorDeviceDistrict(farmId);
+		if (deviceType != null) {
+			JSONArray array = map.get(deviceType);
+			analysisCollectorTypeAndAddtion(array, deviceDistrict, deviceType, collectorDeviceValueArray);
+		} else {
+			for (Entry<String, JSONArray> entry : map.entrySet()) {
+				String type = entry.getKey();
+				JSONArray array = entry.getValue();
+				analysisCollectorTypeAndAddtion(array, deviceDistrict, type, collectorDeviceValueArray);
 			}
+		}
 		return collectorDeviceValueArray;
 	}
 
@@ -194,8 +204,8 @@ public class CollectorDeviceValueService {
 					if (farmCollectorDevice == null || (deviceDistrict != null && !farmCollectorDevice.getDeviceDistrict().equals(deviceDistrict))) {
 						continue;
 					}
-					//JSONObject deviceValueJsonObject = JsonObjectUtil.fromBean(CacheDataBase.collectorDeviceMainValueMap.get(deviceNo));
-					JSONObject deviceValueJsonObject = JsonObjectUtil.fromBean(collectorDeviceValueRedisUtil.getCollectorDeviceValue(farmCollectorDevice.getFarmId(), deviceNo));
+					JSONObject deviceValueJsonObject = JsonObjectUtil.fromBean(collectorDeviceValueRedisUtil.getCollectorDeviceValue(
+							farmCollectorDevice.getFarmId(), deviceNo));
 					if (deviceValueJsonObject == null) {
 						deviceValueJsonObject = new JSONObject();
 						deviceValueJsonObject.put("deviceId", deviceNo);
@@ -205,7 +215,7 @@ public class CollectorDeviceValueService {
 				}
 			}
 		}
-		packagingDeviceValue(jsonObject, list, deviceType);
+		packagingDeviceValue(jsonObject, list, DeviceValueType.getValueTypeByCode(deviceType));
 		collectorDeviceValueArray.add(jsonObject);
 
 	}
@@ -226,24 +236,16 @@ public class CollectorDeviceValueService {
 	 * @param type
 	 * @return
 	 */
-	public JSONObject packagingDeviceValue(JSONObject jsonObject, JSONArray array, String type) {
+	public JSONObject packagingDeviceValue(JSONObject jsonObject, JSONArray array, DeviceValueType deviceValueType) {
+		if (deviceValueType == null) {
+			return jsonObject;
+		}
 		jsonObject.put("data", array);
-		jsonObject.put("type", type);
-		if (CacheDataBase.collectorDeviceTitle.containsKey(type)) {
-			jsonObject.put("header", CacheDataBase.collectorDeviceTitle.get(type));
-		} else {
-			jsonObject.put("header", "");
-		}
-		if (CacheDataBase.collectorDeviceTitle.containsKey(type + "Code")) {
-			jsonObject.put("code", CacheDataBase.collectorDeviceTitle.get(type + "Code"));
-		} else {
-			jsonObject.put("code", "");
-		}
-		if (CacheDataBase.collectorDeviceTitle.containsKey(type + "Unit")) {
-			jsonObject.put("unit", CacheDataBase.collectorDeviceTitle.get(type + "Unit"));
-		} else {
-			jsonObject.put("unit", "");
-		}
+		jsonObject.put("type", deviceValueType.getCode());
+		jsonObject.put("typeName", deviceValueType.getChineseName());
+		jsonObject.put("header", deviceValueType.getParam());
+		jsonObject.put("code", deviceValueType.getParamCode());
+		jsonObject.put("unit", deviceValueType.getParamUnit());
 		return jsonObject;
 	}
 
@@ -291,7 +293,8 @@ public class CollectorDeviceValueService {
 		JSONArray array = new JSONArray();
 		if (fCollectorDevice.getFarmId() != null) {
 			if (fCollectorDevice.getDeviceDistrict() != null) {
-				array = farmCollectorDeviceService.queryCollectorDeviceDistrict(fCollectorDevice.getFarmId()).get(fCollectorDevice.getDeviceDistrict());
+				array = farmCollectorDeviceService.queryCollectorDeviceDistrict(fCollectorDevice.getFarmId()).get(
+						fCollectorDevice.getDeviceDistrict());
 			} else {
 				Set<String> set = farmCollectorDeviceService.queryCollectorDeviceDistrict(fCollectorDevice.getFarmId()).keySet();
 				array = JSONArray.parseArray(JSON.toJSONString(set));
@@ -299,13 +302,13 @@ public class CollectorDeviceValueService {
 		}
 		return array;
 	}
-	
+
 	public void saveCollectorDeviceCache(Long deviceId, DeviceValueBase collectorDeviceValue) {
 		try {
 			collectorDeviceValueRedisUtil.saveCollectorDeviceCacheValue(deviceId, collectorDeviceValue);
 		} catch (Exception e) {
-			// TODO: handle exception	
-			LOGGER.error("collector cache redis save error",e);
+			// TODO: handle exception
+			LOGGER.error("collector cache redis save error", e);
 		}
 	}
 }

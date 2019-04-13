@@ -7,8 +7,8 @@ import org.springframework.data.redis.core.ListOperations;
 import org.springframework.stereotype.Component;
 
 import com.ifarm.bean.ControlCommand;
-import com.ifarm.bean.WFMControlCommand;
-import com.ifarm.bean.WFMControlTask;
+import com.ifarm.bean.MultiControlCommand;
+import com.ifarm.bean.MultiControlTask;
 
 @Component
 public class ControlCommandRedisHelper extends BaseLockRedisHelper<Long, ControlCommand> {
@@ -52,10 +52,10 @@ public class ControlCommandRedisHelper extends BaseLockRedisHelper<Long, Control
 		return removeFlat;
 	}
 
-	public void removeWfmControlCommand(WFMControlTask wfmControlTask) {
-		List<WFMControlCommand> list = wfmControlTask.getWfmControlCommands();
+	public void removeWfmControlCommand(MultiControlTask wfmControlTask) {
+		List<MultiControlCommand> list = wfmControlTask.getWfmControlCommands();
 		for (int i = 0; i < list.size(); i++) {
-			WFMControlCommand wCommand = list.get(i);
+			MultiControlCommand wCommand = list.get(i);
 			Long collectorId = wCommand.getCollectorId();
 			if (collectorId != null) {
 				Object lock = getLock(collectorId.toString());

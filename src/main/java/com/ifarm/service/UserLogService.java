@@ -18,7 +18,7 @@ public class UserLogService {
 	public void saveUserLog(HttpServletRequest request, Object object, String userOperateType, String userOperateObject, String returnMessage) {
 		UserLog userLog = new UserLog();
 		userLog.setUserIp(ClientIpUtil.getIpAddress(request));
-		userLog.setRequestMessage(JsonObjectUtil.toJsonObjectString(object).toString());
+		userLog.setRequestMessage(JsonObjectUtil.toJsonObject(object).toString());
 		userLog.setReturnMessage(returnMessage);
 		userLog.setUserOperateObject(userOperateObject);
 		userLog.setUserOperateType(userOperateType);
@@ -39,7 +39,7 @@ public class UserLogService {
 		UserLog userLog = new UserLog();
 		userLog.setUserId(userId);
 		userLog.setUserIp(ClientIpUtil.getIpAddress(request));
-		userLog.setRequestMessage(JsonObjectUtil.toJsonObjectString(object).toJSONString());
+		userLog.setRequestMessage(JsonObjectUtil.toJsonObject(object).toJSONString());
 		userLog.setReturnMessage(returnMessage);
 		userLog.setUserOperateObject(userOperateObject);
 		userLog.setUserOperateType(userOperateType);

@@ -36,7 +36,7 @@
 		"deviceCode": "FKQ801",
 		"deviceDescription": ""
 	}, {
-		"deviceName": "数据采集器)",
+		"deviceName": "数据采集器",
 		"deviceType": "采集器",
 		"deviceTypeCode": "concentrator",
 		"deviceCode": "CJQ801",
@@ -52,49 +52,55 @@
 		"deviceType": "传感器",
 		"deviceCode": "GZS801",
 		"deviceTypeCode": "collectorDevice",
-		"deviceDescription": "5合1"
+		"deviceDescription": ""
 	}, {
 		"deviceName": "空气传感器",
 		"deviceType": "传感器",
 		"deviceCode": "KQS801",
 		"deviceTypeCode": "collectorDevice",
-		"deviceDescription": "5合1"
+		"deviceDescription": ""
 	}, {
 		"deviceName": "土壤传感器",
 		"deviceType": "传感器",
 		"deviceCode": "TRS801",
 		"deviceTypeCode": "collectorDevice",
-		"deviceDescription": "5合1"
+		"deviceDescription": ""
 	}, {
 		"deviceName": "氧气传感器",
 		"deviceType": "传感器",
 		"deviceCode": "YQS801",
 		"deviceTypeCode": "collectorDevice",
-		"deviceDescription": "5合1"
+		"deviceDescription": ""
 	}, {
 		"deviceName": "二氧化碳传感器",
 		"deviceType": "传感器",
 		"deviceCode": "CO2801",
 		"deviceTypeCode": "collectorDevice",
-		"deviceDescription": "5合1"
+		"deviceDescription": ""
 	}, {
 		"deviceName": "气象监测站",
-		"deviceType": "",
+		"deviceType": "传感器",
 		"deviceCode": "QXZ801",
 		"deviceTypeCode": "collectorDevice",
-		"deviceDescription": "5合1"
+		"deviceDescription": ""
 	}, {
 		"deviceName": "LED控制器",
 		"deviceType": "传感器",
 		"deviceCode": "LED801",
 		"deviceTypeCode": "controlDevice",
-		"deviceDescription": "5合1"
+		"deviceDescription": ""
 	}, {
 		"deviceName": "土壤PH值传感器",
-		"deviceType": "",
+		"deviceType": "传感器",
 		"deviceCode": "TRS802",
 		"deviceTypeCode": "collectorDevice",
-		"deviceDescription": "5合1"
+		"deviceDescription": ""
+	}, {
+		"deviceName": "环境传感器",
+		"deviceType": "传感器",
+		"deviceCode": "TGQ802",
+		"deviceTypeCode": "collectorDevice",
+		"deviceDescription": "7合1" 
 	}],
 	"deviceTypeNo": {
 		"ZJQ801": 11,
@@ -112,24 +118,53 @@
 		"CO2801": 22,
 		"QXZ801": 23,
 		"LED801": 24,
-		"TRS802": 25
+		"TRS802": 25,
+		"TGQ802": 26
 	},
 	"deviceNo": {
 	    "ZJQ801": 00,
 		"DTU801": 01,
 		"DTU802": 02,
-		"DTU803": 03,
-		"TDQ801": 04,
-		"FKQ801": 05,
-		"CJQ801": 06,
-		"TGQ801": 07,
-		"GZS801": 08,
-		"KQS801": 09,
-		"TRS801": 10,
-		"YQS801": 11,
-		"CO2801": 12,
-		"QXZ801": 13,
-		"LED801": 14,
-		"TRS802": 15
+		"DTU803": 02,
+		"TDQ801": 03,
+		"FKQ801": 04,
+		"CJQ801": 05,
+		"TGQ801": 06,
+		"GZS801": 07,
+		"KQS801": 08,
+		"TRS801": 09,
+		"YQS801": 10,
+		"CO2801": 11,
+		"QXZ801": 12,
+		"LED801": 13,
+		"TRS802": 14,
+		"TGQ802": 15
+	},
+	"deviceCode": {
+		"TGQ801": "five_with_one",
+		"GZS801": "illuminition",
+		"KQS801": "airTemHum",
+		"TRS801": "soilTemHum",
+		"YQS801": "oxygen",
+		"CO2801": "co2",
+		"TGQ802": "seven_with_one",
+		"QXZ801": "weatherMonitor"
+	},
+	"deviceTypeMappingCommand": {
+		"five_with_one": 06,
+		"seven_with_one": 15,
+		"weatherMonitor": 12
+	},
+	"deviceName": {
+	    "five_with_one": "五合一采集设备",
+		"illuminition": "光照强度采集设备",
+		"airTemHum": "空气温湿度采集设备",
+		"soilTemHum": "土壤温湿度采集设备",
+		"oxygen": "氧气采集设备",
+		"co2": "二氧化碳采集设备",
+		"seven_with_one": "七合一采集设备",
+		"collectorType5": "五合一采集设备",
+		"collectorType7": "七合一采集设备",
+		"weatherMonitor": "气象监测站"
 	}
 }

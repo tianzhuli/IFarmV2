@@ -21,7 +21,7 @@ public abstract class AbstractArrayEncoder extends ProtocolEncoderAdapter{
 		buffer.put(lens[1]);
 		buffer.put(bytes);
 		byte[] checkArray = buffer.array();
- 		byte checkNum = ByteConvert.checekByte(checkArray, 0, bytes.length - 1);
+ 		byte checkNum = ByteConvert.checekByte(checkArray, 0, checkArray.length - 1);
 		buffer.put(checkNum);
 		buffer.put((byte) 0x16);
 		buffer.flip();

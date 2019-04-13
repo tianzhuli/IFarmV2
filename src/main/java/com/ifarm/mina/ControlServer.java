@@ -15,10 +15,10 @@ import com.ifarm.util.CacheDataBase;
 @Component
 public class ControlServer {
 	@Autowired
-	private ControlByteIoHandler controlByteIoHandler;
+	private IoControlHandler controlByteIoHandler;
 	
 	@Autowired
-	private ControlByteArrayCodecFactory codecFactory;
+	private ControlArrayCodecFactory codecFactory;
 	
 	public void start() throws IOException {
 		NioSocketAcceptor acceptor = new NioSocketAcceptor();

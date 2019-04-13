@@ -9,23 +9,16 @@
 			<param name="LevelMin" value="DEBUG" />
 		</filter>
 	</appender>
-	<appender name="FILE" class="org.apache.log4j.FileAppender">
-		<param name="File" value="E:/ifarm.log" />
-		<param name="Append" value="true" />
-		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss:SSS} [%-5p]: %c - %l %m%n" />
-		</layout>
-	</appender>
-	<appender name="DailyRollingFileAppenderFarm" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="E:/dailylog/ifarm/ifarm.log" />
+	<appender name="SPRING-ERROR" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${user.dir}/logs/IFarm/spring-error.log" />
 		<param name="Append" value="true" />
 		<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss:SSS} [%-5p]: %c - %l %m%n" />
 		</layout>
 	</appender>
-	<appender name="RollingFileAppender" class="org.apache.log4j.RollingFileAppender">
-		<param name="File" value="E:/log/ifarm.log" />
+	<appender name="COMMON-DEFAULT" class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="${user.dir}/logs/IFarm/common-default.log" />
 		<param name="Append" value="true" />
 		<param name="MaxFileSize" value="1MB" />
 		<param name="MaxBackupIndex" value="10" />
@@ -33,8 +26,8 @@
 			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss:SSS} [%-5p]: %c - %l %m%n" />
 		</layout>
 	</appender>
-	<appender name="RollingFileAppenderFarm" class="org.apache.log4j.RollingFileAppender">
-		<param name="File" value="E:/log/ifarm/ifarm.log" />
+	<appender name="FARM—DEFAULT" class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="${user.dir}/logs/IFarm/ifarm-default.log" />
 		<param name="Append" value="true" />
 		<param name="MaxFileSize" value="1MB" />
 		<param name="MaxBackupIndex" value="10" />
@@ -42,8 +35,48 @@
 			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss:SSS} [%-5p]: %c - %l %m%n" />
 		</layout>
 	</appender>
-	<appender name="DailyRollingFileAppender" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="E:/dailylog/ifarm.log" />
+	<appender name="SAL—INFO" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${user.dir}/logs/IFarm/sal-info.log" />
+		<param name="Append" value="true" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss:SSS} [%-5p]: %c - %l %m%n" />
+		</layout>
+	</appender>
+	<appender name="MESSAGE—DIGEST" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${user.dir}/logs/IFarm/message-digest.log" />
+		<param name="Append" value="true" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss:SSS} [%-5p]: %c - %l %m%n" />
+		</layout>
+	</appender>
+	<appender name="MINA—DIGEST" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${user.dir}/logs/IFarm/mina-digest.log" />
+		<param name="Append" value="true" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss:SSS} [%-5p]: %c - %l %m%n" />
+		</layout>
+	</appender>
+	<appender name="HEART—DIGEST" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${user.dir}/logs/IFarm/heart-digest.log" />
+		<param name="Append" value="true" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss:SSS} [%-5p]: %c - %l %m%n" />
+		</layout>
+	</appender>
+	<appender name="HEART—INFO" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${user.dir}/logs/IFarm/heart-info.log" />
+		<param name="Append" value="true" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss:SSS} [%-5p]: %c - %l %m%n" />
+		</layout>
+	</appender>
+	<appender name="NETTY—DIGEST" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${user.dir}/logs/IFarm/netty-digest.log" />
 		<param name="Append" value="true" />
 		<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />
 		<layout class="org.apache.log4j.PatternLayout">
@@ -52,38 +85,64 @@
 	</appender>
 	<category name="org.springframework">
 		<level value="ERROR" />
-		<appender-ref ref="DailyRollingFileAppender" />
+		<appender-ref ref="SPRING-ERROR" />
 		<appender-ref ref="CONSOLE" />
 	</category>
+	
 	<category name="org.mongodb.driver.cluster">
 		<level value="INFO" />
 	</category>
+	
 	<category name="org.apache.commons">
 		<level value="INFO" />
 	</category>
+	
 	<category name="com.mchange.v2">
 		<level value="INFO" />
 	</category>
+	
 	<category name="org.apache.mina">
 		<level value="INFO" />
 	</category>
+	
 	<category name="org.hibernate">
-		<level value="ERROR" />
-		<appender-ref ref="CONSOLE" />
-		<appender-ref ref="DailyRollingFileAppender" />
+		<level value="INFO" />
+		<appender-ref ref="SAL—INFO" />
 	</category>
-	<category name="net.sf.ehcache">
-		<level value="INFO"/>
-		<appender-ref ref="CONSOLE" />
+	
+	<category name="MESSAGE—DIGEST">
+		<level value="INFO" />
+		<appender-ref ref="MESSAGE—DIGEST" />
 	</category>
+	
+	<category name="MINA—DIGEST">
+		<level value="INFO" />
+		<appender-ref ref="MINA—DIGEST" />
+	</category>
+	
+	<category name="HEART—DIGEST">
+		<level value="INFO" />
+		<appender-ref ref="HEART—DIGEST" />
+	</category>
+	
+	<category name="HEART—INFO">
+		<level value="INFO" />
+		<appender-ref ref="HEART—INFO" />
+	</category>
+	
+	<category name="NETTY—DIGEST">
+		<level value="INFO" />
+		<appender-ref ref="NETTY—DIGEST" />
+	</category>
+	
 	<category name="com.ifarm">
-		<level value="ALL" />
-		<!-- <appender-ref ref="CONSOLE" /> -->
-		<appender-ref ref="RollingFileAppenderFarm" />
+		<level value="INFO" />
+		<appender-ref ref="FARM—DEFAULT" />
 	</category>
+	
 	<root>
-		<priority value="debug" />
+		<priority value="INFO" />
 		<appender-ref ref="CONSOLE" />
-		<appender-ref ref="RollingFileAppender" />
+		<appender-ref ref="COMMON-DEFAULT" />
 	</root>
 </log4j:configuration>

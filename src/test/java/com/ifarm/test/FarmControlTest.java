@@ -8,8 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.ifarm.bean.WFMControlCommand;
-import com.ifarm.bean.WFMControlTask;
+import com.ifarm.bean.MultiControlCommand;
+import com.ifarm.bean.MultiControlTask;
+import com.ifarm.service.CommandConvertService;
 import com.ifarm.service.FarmControlSystemService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -17,28 +18,31 @@ import com.ifarm.service.FarmControlSystemService;
 public class FarmControlTest {
 	@Autowired
 	private FarmControlSystemService farmControlSystemService;
+	
+	@Autowired
+	private CommandConvertService commandConvertService;
 
 	@Test
 	public void test() {
-		WFMControlTask controlTask = new WFMControlTask();
-		controlTask.setSystemId(100001);
+		MultiControlTask controlTask = new MultiControlTask();
+		controlTask.setUnitId(100001);
 		controlTask.setControlType("fertilizer");
 		controlTask.setControlArea("2");
 		controlTask.setCanNo("1,2");
 		controlTask.setLevel(2);
 		controlTask.setCommandCategory("execution");
-		farmControlSystemService.produceWFMControlTaskCommand(controlTask);
-		List<WFMControlCommand> commads = controlTask.getWfmControlCommands();
+		farmControlSystemService.produceMultiControlTaskCommand(controlTask);
+		List<MultiControlCommand> commads = controlTask.getWfmControlCommands();
 		for (int i = 0; i < commads.size(); i++) {
-			WFMControlCommand commad = commads.get(i);
-			byte[] arr = commad.commandToByte();
+			MultiControlCommand commad = commads.get(i);
+			byte[] arr = commandConvertService.commandToByte(commad);
 			System.out.println("deviceId:" + commad.getControlDeviceId());
 			for (int j = 0; j < arr.length; j++) {
 				System.out.print(Integer.toHexString(arr[j] & 0xff) + " ");
 			}
 			System.out.println();
 			commad.setCommandCategory("stop");
-			byte[] arr1 = commad.commandToByte();
+			byte[] arr1 = commandConvertService.commandToByte(commad);
 			System.out.println("indentifying:" + commad.getIndentifying());
 			for (int j = 0; j < arr1.length; j++) {
 				System.out.print(Integer.toHexString(arr1[j] & 0xff) + " ");

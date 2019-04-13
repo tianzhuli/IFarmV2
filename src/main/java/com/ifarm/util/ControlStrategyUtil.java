@@ -33,15 +33,13 @@ public class ControlStrategyUtil {
 	public static void controlTaskOperation(ControlTask controlTask, List<Object[]> list) throws Exception {
 		String controlType = controlTask.getControlType(); // 不同的控制类型业务完全不同
 		Method method = ControlStrategyUtil.class.getMethod(controlType, new Class[] { ControlTask.class, List.class });
+		if (method == null) {
+			throw new Exception("controlType is error");
+		}
 		method.invoke(null, controlTask, list);
 	}
-
-	/**
-	 * 顶卷帘的控制,操作就是升和降,rise and fall
-	 * 
-	 * @param controlTask
-	 */
-	public static void topRollerShuttersControl(ControlTask controlTask, List<Object[]> list) {
+	
+	public static void baseControlDeal(ControlTask controlTask, List<Object[]> list) {
 		String controlOperation = controlTask.getControlOperation();
 		int[] bits = new int[32];
 		int riseBit = 0;
@@ -57,27 +55,24 @@ public class ControlStrategyUtil {
 		}
 		controlTask.setControlTerminalbits(bits);
 	}
+	
+	
+	/**
+	 * 顶卷帘的控制,操作就是升和降,rise and fall
+	 * 
+	 * @param controlTask
+	 */
+	public static void topRollerShutterControl(ControlTask controlTask, List<Object[]> list) {
+		baseControlDeal(controlTask, list);
+	}
 
 	/**
 	 * 侧卷帘的控制
 	 * 
 	 * @param controlTask
 	 */
-	public static void sideRollerShuttersControl(ControlTask controlTask, List<Object[]> list) {
-		String controlOperation = controlTask.getControlOperation();
-		int[] bits = new int[32];
-		int enableBit = 0;
-		for (int i = 0; i < list.size(); i++) {
-			Object[] farmControlTerminal = list.get(i);
-			String functionCode = (String) farmControlTerminal[5];
-			if ("enable".equals(functionCode)) {
-				enableBit = (int) farmControlTerminal[3];
-			}
-		}
-		if ("enable".equals(controlOperation)) {
-			bits[enableBit] = 1;
-		}
-		controlTask.setControlTerminalbits(bits);
+	public static void sideRollerShutterControl(ControlTask controlTask, List<Object[]> list) {
+		baseControlDeal(controlTask, list);
 	}
 
 	/**
@@ -86,20 +81,7 @@ public class ControlStrategyUtil {
 	 * @param controlTask
 	 */
 	public static void sunshadeControl(ControlTask controlTask, List<Object[]> list) {
-		String controlOperation = controlTask.getControlOperation();
-		int[] bits = new int[32];
-		int enableBit = 0;
-		for (int i = 0; i < list.size(); i++) {
-			Object[] farmControlTerminal = list.get(i);
-			String functionCode = (String) farmControlTerminal[5];
-			if ("enable".equals(functionCode)) {
-				enableBit = (int) farmControlTerminal[3];
-			}
-		}
-		if ("enable".equals(controlOperation)) {
-			bits[enableBit] = 1;
-		}
-		controlTask.setControlTerminalbits(bits);
+		baseControlDeal(controlTask, list);
 	}
 
 	/**
@@ -108,21 +90,7 @@ public class ControlStrategyUtil {
 	 * @param controlTask
 	 */
 	public static void valveControl(ControlTask controlTask, List<Object[]> list) {
-		String controlOperation = controlTask.getControlOperation();
-		int[] bits = new int[32];
-		int enableBit = 0;
-		for (int i = 0; i < list.size(); i++) {
-			Object[] farmControlTerminal = list.get(i);
-			String functionCode = (String) farmControlTerminal[5];
-			if ("enable".equals(functionCode)) {
-				enableBit = (int) farmControlTerminal[3];
-			}
-		}
-		if ("enable".equals(controlOperation)) {
-			bits[enableBit] = 1;
-		}
-		controlTask.setControlTerminalbits(bits);
-
+		baseControlDeal(controlTask, list);
 	}
 
 	/**
@@ -130,21 +98,8 @@ public class ControlStrategyUtil {
 	 * 
 	 * @param controlTask
 	 */
-	public static void waterRollerShuttersControl(ControlTask controlTask, List<Object[]> list) {
-		String controlOperation = controlTask.getControlOperation();
-		int[] bits = new int[32];
-		int enableBit = 0;
-		for (int i = 0; i < list.size(); i++) {
-			Object[] farmControlTerminal = list.get(i);
-			String functionCode = (String) farmControlTerminal[5];
-			if ("enable".equals(functionCode)) {
-				enableBit = (int) farmControlTerminal[3];
-			}
-			if ("enable".equals(controlOperation)) {
-				bits[enableBit] = 1;
-			}
-		}
-		controlTask.setControlTerminalbits(bits);
+	public static void waterRollerShutterControl(ControlTask controlTask, List<Object[]> list) {
+		baseControlDeal(controlTask, list);
 	}
 
 	/**
@@ -153,21 +108,7 @@ public class ControlStrategyUtil {
 	 * @param controlTask
 	 */
 	public static void fillLightControl(ControlTask controlTask, List<Object[]> list) {
-		String controlOperation = controlTask.getControlOperation();
-		int[] bits = new int[32];
-		int enableBit = 0;
-		for (int i = 0; i < list.size(); i++) {
-			Object[] farmControlTerminal = list.get(i);
-			String functionCode = (String) farmControlTerminal[5];
-			if ("enable".equals(functionCode)) {
-				enableBit = (int) farmControlTerminal[3];
-			}
-			if ("enable".equals(controlOperation)) {
-				bits[enableBit] = 1;
-			}
-		}
-		controlTask.setControlTerminalbits(bits);
-	
+		baseControlDeal(controlTask, list);
 	}
 
 	/**
@@ -176,21 +117,7 @@ public class ControlStrategyUtil {
 	 * @param controlTask
 	 */
 	public static void draughtFanControl(ControlTask controlTask, List<Object[]> list) {
-		String controlOperation = controlTask.getControlOperation();
-		int[] bits = new int[32];
-		int enableBit = 0;
-		for (int i = 0; i < list.size(); i++) {
-			Object[] farmControlTerminal = list.get(i);
-			String functionCode = (String) farmControlTerminal[5];
-			if ("enable".equals(functionCode)) {
-				enableBit = (int) farmControlTerminal[3];
-			}
-			if ("enable".equals(controlOperation)) {
-				bits[enableBit] = 1;
-			}
-		}
-		controlTask.setControlTerminalbits(bits);
-	
+		baseControlDeal(controlTask, list);
 	}
 
 	/**
@@ -199,7 +126,7 @@ public class ControlStrategyUtil {
 	 * @param controlTask
 	 */
 	public static void temperatureControl(ControlTask controlTask, List<Object[]> list) {
-
+		baseControlDeal(controlTask, list);
 	}
 
 	/**
@@ -208,7 +135,7 @@ public class ControlStrategyUtil {
 	 * @param controlTask
 	 */
 	public static void humidityControl(ControlTask controlTask, List<Object[]> list) {
-
+		baseControlDeal(controlTask, list);
 	}
 
 	/**
@@ -217,21 +144,7 @@ public class ControlStrategyUtil {
 	 * @param controlTask
 	 */
 	public static void carbonDioxideControl(ControlTask controlTask, List<Object[]> list) {
-		String controlOperation = controlTask.getControlOperation();
-		int[] bits = new int[32];
-		int enableBit = 0;
-		for (int i = 0; i < list.size(); i++) {
-			Object[] farmControlTerminal = list.get(i);
-			String functionCode = (String) farmControlTerminal[5];
-			if ("enable".equals(functionCode)) {
-				enableBit = (int) farmControlTerminal[3];
-			}
-			if ("enable".equals(controlOperation)) {
-				bits[enableBit] = 1;
-			}
-		}
-		controlTask.setControlTerminalbits(bits);
-	
+		baseControlDeal(controlTask, list);
 	}
 
 	/**
@@ -240,6 +153,6 @@ public class ControlStrategyUtil {
 	 * @param controlTask
 	 */
 	public static void oxygenControl(ControlTask controlTask, List<Object[]> list) {
-
+		baseControlDeal(controlTask, list);
 	}
 }

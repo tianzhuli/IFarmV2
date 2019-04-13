@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="profiler.settings.instrument.empty.methods">true</entry>
+<entry key="ProfilerCPUSettings_profile_runnables">true</entry>
+<entry key="ProfilerCPUSettings_filter_type">2</entry>
+<entry key="ProfilerMemorySettings_track_every">10</entry>
+<entry key="ProfilerMemorySettings_mode">4</entry>
+<entry key="ProfilerCPUSettings_root_classes">com.ifarm.annotation.**
+com.ifarm.aspect.**
+com.ifarm.bean.**
+com.ifarm.constant.**
+com.ifarm.dao.**
+com.ifarm.enums.**
+com.ifarm.exception.**
+com.ifarm.interceptor.**
+com.ifarm.log.**
+com.ifarm.mina.**
+com.ifarm.mqtt.**
+com.ifarm.netty.**
+com.ifarm.nosql.bean.**
+com.ifarm.nosql.dao.**
+com.ifarm.nosql.service.**
+com.ifarm.observer.**
+com.ifarm.parse.**
+com.ifarm.processor.**
+com.ifarm.redis.util.**
+com.ifarm.service.**
+com.ifarm.test.**
+com.ifarm.upload.**
+com.ifarm.util.**
+com.ifarm.web.**
+com.ifarm.wrapper.**
+</entry>
+<entry key="ProfilerCPUSettings_filter_value">com.ifarm.annotation.*,
+com.ifarm.aspect.*,
+com.ifarm.bean.*,
+com.ifarm.constant.*,
+com.ifarm.dao.*,
+com.ifarm.enums.*,
+com.ifarm.exception.*,
+com.ifarm.interceptor.*,
+com.ifarm.log.*,
+com.ifarm.mina.*,
+com.ifarm.mqtt.*,
+com.ifarm.netty.*,
+com.ifarm.nosql.bean.*,
+com.ifarm.nosql.dao.*,
+com.ifarm.nosql.service.*,
+com.ifarm.observer.*,
+com.ifarm.parse.*,
+com.ifarm.processor.*,
+com.ifarm.redis.util.*,
+com.ifarm.service.*,
+com.ifarm.test.*,
+com.ifarm.upload.*,
+com.ifarm.util.*,
+com.ifarm.web.*,
+com.ifarm.wrapper.*</entry>
+<entry key="profiler.settings.istrument.getter.setter.methods">true</entry>
+<entry key="myeclipse.profiling.mode">0</entry>
+<entry key="ProfilerMemorySettings_stacktraces">-1</entry>
+</properties>

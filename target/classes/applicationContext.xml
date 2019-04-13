@@ -12,7 +12,9 @@
 	http://www.springframework.org/schema/mvc  http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
 	http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.2.xsd">
 
-	<context:component-scan base-package="com.ifarm" />
+	<context:component-scan base-package="com.ifarm">
+		<context:exclude-filter type="regex" expression="com.ifarm.websocket.*"/>
+	</context:component-scan>
 
 	<context:property-placeholder location="classpath:persistence-mysql.properties" />
 
@@ -118,10 +120,12 @@
 		p:valueSerializer-ref="jdkSerializer" /> -->
 	<bean id="stringRedisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate"
 		p:connection-factory-ref="jedisConnectionFactory" />
+	
+	<bean id="customExceptionHandler" class="com.ifarm.exception.CustomExceptionHandler"/>
 		
 	<bean
 		class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
-		<property name="defaultErrorView" value="pages/error"></property>
+		<property name="defaultErrorView" value="error"></property>
 		<property name="exceptionAttribute" value="ex"></property>
 	</bean>
 </beans>

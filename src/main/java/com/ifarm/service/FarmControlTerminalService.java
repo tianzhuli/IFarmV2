@@ -1,102 +1,125 @@
 package com.ifarm.service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ifarm.bean.FarmControlDevice;
-import com.ifarm.bean.FarmControlSystem;
 import com.ifarm.bean.FarmControlTerminal;
-import com.ifarm.bean.FarmWFMControlSystem;
-import com.ifarm.constant.SystemResultCodeEnum;
+import com.ifarm.bean.FarmControlUnit;
 import com.ifarm.dao.FarmControlDeviceDao;
-import com.ifarm.dao.FarmControlSystemDao;
-import com.ifarm.dao.FarmControlSystemWFMDao;
 import com.ifarm.dao.FarmControlTerminalDao;
+import com.ifarm.dao.FarmControlUnitDao;
+import com.ifarm.enums.ControlSystemEnum;
+import com.ifarm.enums.SystemReturnCodeEnum;
+import com.ifarm.exception.ValidatorException;
+import com.ifarm.util.CacheDataBase;
 import com.ifarm.util.JsonObjectUtil;
 import com.ifarm.util.SystemResultEncapsulation;
 
 @Service
 @SuppressWarnings("rawtypes")
-public class FarmControlTerminalService {
+public class FarmControlTerminalService extends
+		AbstractFarmService<FarmControlTerminalDao, FarmControlTerminal> {
 	@Autowired
 	private FarmControlTerminalDao farmControlTerminalDao;
 	@Autowired
 	private FarmControlDeviceDao farmControlDeviceDao;
 	@Autowired
-	private FarmControlSystemDao farmControlSystemDao;
-	@Autowired
-	private FarmControlSystemWFMDao farmControlSystemWFMDao;
-	
+	private FarmControlUnitDao farmControlUnitDao;
+
 	String[] controlTerminalKeys = { "functionName", "functionCode" };
 
-	private static final Logger FARM_CONTROL_TERMINAL_SERVICE_LOGGER = LoggerFactory.getLogger(FarmControlTerminalService.class);
+	String[] wfmFunctionName = { "灌溉", "施肥", "施药" };
 
-	public String getFarmControlOperationList(FarmControlTerminal farmControlTerminal) {
-		List list = farmControlTerminalDao.getFarmControlOperationList(farmControlTerminal);
-		JSONArray array = new JSONArray();
-		Map<String, String> functionMap = new HashMap<String, String>();
-		for (int i = 0; i < list.size(); i++) {
-			Object[] objects = (Object[]) list.get(i);
-			JSONObject jsonObject = new JSONObject();
-			if (!functionMap.containsKey(objects[1])) {
-				jsonObject.put(controlTerminalKeys[0], objects[0]);
-				jsonObject.put(controlTerminalKeys[1], objects[1]);
-				array.add(jsonObject);
-				functionMap.put(objects[1].toString(), "");
-			}
+	String[] wfmFunctionCode = { "irrigate", "fertilizer", "medicine" };
+
+	public String getFarmControlOperationList(
+			FarmControlTerminal farmControlTerminal) {
+		List list = farmControlTerminalDao
+				.getFarmControlOperationList(farmControlTerminal);
+		FarmControlUnit farmControlUnit = farmControlUnitDao.getTById(
+				farmControlTerminal.getUnitId(), FarmControlUnit.class);
+		if (list.size() <= 0 || farmControlUnit == null) {
+			throw new ValidatorException("unit terminal no config");
 		}
-		return array.toString();
+		return CacheDataBase.initBaseConfig.get("terminalType.json")
+				.getJSONObject("ControlOperation")
+				.getJSONArray(farmControlUnit.getSystemType()).toString();
 	}
 
-	public String saveFarmControlSystem(FarmControlTerminal farmControlTerminal) {
-		try {
-			if (farmControlTerminal.getControlDeviceId() == null || farmControlTerminal.getSystemId() == null
-					|| farmControlTerminal.getControlDeviceBit() == null) {
-				return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.NO_ID);
-			}
-			FarmControlDevice farmControlDevice = farmControlDeviceDao.getTById(farmControlTerminal.getControlDeviceId(), FarmControlDevice.class);
-			if (farmControlDevice == null) {
-				return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.NO_DEVICE);
-			}
-			FarmControlSystem farmControlSystem = farmControlSystemDao.getTById(farmControlTerminal.getSystemId(), FarmControlSystem.class);
-			FarmWFMControlSystem fWfmControlSystem = farmControlSystemWFMDao.getTById(farmControlTerminal.getSystemId(), FarmWFMControlSystem.class);
-			if (farmControlSystem == null && fWfmControlSystem == null) {
-				return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.NO_SMYSTM);
-			}
-			farmControlTerminalDao.saveFarmControlTerminal(farmControlTerminal);
-			// CacheDataBase.controlTeminalDetailMap.put(terminalId,
-			// JsonObjectUtil.fromBean(farmControlTerminal));
-			return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.SUCCESS);
-		} catch (Exception e) {
-			// TODO: handle exception
-			FARM_CONTROL_TERMINAL_SERVICE_LOGGER.error(e.getMessage());
-			FARM_CONTROL_TERMINAL_SERVICE_LOGGER.error("添加控制系统终端", e);
-			return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.ERROR);
+	public String saveFarmControlTerminal(
+			FarmControlTerminal farmControlTerminal) {
+		FarmControlDevice farmControlDevice = farmControlDeviceDao.getTById(
+				farmControlTerminal.getControlDeviceId(),
+				FarmControlDevice.class);
+		if (farmControlDevice == null) {
+			return SystemResultEncapsulation.fillResultCode(
+					SystemReturnCodeEnum.PARAM_ERROR, "device no exist");
 		}
+		FarmControlUnit farmControlUnit = farmControlUnitDao.getTById(
+				farmControlTerminal.getUnitId(), FarmControlUnit.class);
+		if (farmControlUnit == null) {
+			return SystemResultEncapsulation.fillResultCode(
+					SystemReturnCodeEnum.PARAM_ERROR, "unit no exist");
+		}
+		super.validator(farmControlTerminal);
+		FarmControlTerminal contorlDeviceTerminal = new FarmControlTerminal(
+				farmControlTerminal.getControlDeviceId(),
+				farmControlTerminal.getControlDeviceBit());
+		List controlTermList = farmControlTerminalDao
+				.getDynamicList(contorlDeviceTerminal);
+		if (controlTermList.size() > 0) {
+			return SystemResultEncapsulation.fillResultCode(
+					SystemReturnCodeEnum.UNIQUE_ERROR, null,
+					"exist same controlId and bit");
+		}
+		if (ControlSystemEnum.WATER_FERTILIZER_MEDICINDE
+				.equals(ControlSystemEnum.getValueByType(farmControlTerminal
+						.getControlType()))) {
+			FarmControlTerminal identifyingTerminal = new FarmControlTerminal(
+					farmControlTerminal.getUnitId(),
+					farmControlTerminal.getTerminalIdentifying());
+			List identifyingTerminalList = farmControlTerminalDao
+					.getDynamicList(identifyingTerminal);
+			if (identifyingTerminalList.size() > 0) {
+				return SystemResultEncapsulation.fillResultCode(
+						SystemReturnCodeEnum.UNIQUE_ERROR, null,
+						"exist same unit and identifying");
+			}
+		}
+		return super.baseSave(farmControlTerminal);
+
 	}
 
-	public String getFarmControlTerminals(FarmControlTerminal farmControlTerminal) {
-		List<FarmControlTerminal> controlTerminalrms = farmControlTerminalDao.getDynamicList(farmControlTerminal);
-		return JsonObjectUtil.toJsonArrayString(controlTerminalrms);
+	public String getFarmControlTerminals(
+			FarmControlTerminal farmControlTerminal) {
+		JSONArray jsonArray = new JSONArray();
+		List<FarmControlTerminal> controlTerminalrms = farmControlTerminalDao
+				.getDynamicList(farmControlTerminal);
+		for (int i = 0; i < controlTerminalrms.size(); i++) {
+			FarmControlTerminal fControlTerminal = controlTerminalrms.get(i);
+			JSONObject jsonObject = JsonObjectUtil
+					.toJsonObject(fControlTerminal);
+			jsonObject.put(
+					"controlName",
+					CacheDataBase.initBaseConfig.get("controlSystemType.json")
+							.getJSONObject("systemName")
+							.getString(fControlTerminal.getControlType()));
+			jsonArray.add(jsonObject);
+		}
+		return jsonArray.toJSONString();
 	}
 
-	public String deleteFarmControlTerminal(FarmControlTerminal farmControlTerminal) {
-		try {
-			farmControlTerminalDao.deleteBase(farmControlTerminal);
-			return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.SUCCESS);
-		} catch (Exception e) {
-			// TODO: handle exception
-			FARM_CONTROL_TERMINAL_SERVICE_LOGGER.error(JSON.toJSONString(farmControlTerminal) + "-delete error", e);
-			return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.ERROR);
+	public String buildHandCommand(FarmControlTerminal farmControlTerminal) {
+		List<FarmControlTerminal> farmControlTerminals = farmControlTerminalDao
+				.getDynamicList(farmControlTerminal);
+		for (int i = 0; i < farmControlTerminals.size(); i++) {
+
 		}
+		return null;
 	}
 }

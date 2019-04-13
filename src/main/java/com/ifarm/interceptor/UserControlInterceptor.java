@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.alibaba.fastjson.JSONObject;
 import com.ifarm.bean.User;
 import com.ifarm.constant.SystemResultCodeEnum;
 import com.ifarm.redis.util.UserRedisUtil;
@@ -27,15 +26,20 @@ public class UserControlInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		// TODO Auto-generated method stub
-		CONTROLTERCEPTOR_LOG.info(request.getRequestURI() + "---" + JSONObject.toJSONString(request.getParameterMap()));
+		//CONTROLTERCEPTOR_LOG.info(request.getRequestURI() + "---" + JSONObject.toJSONString(request.getParameterMap()));
 		String signature = request.getParameter("signature");
 		String userId = request.getParameter("userId");
+		String managerId = request.getParameter("managerId");
+		if (managerId != null) {
+			return true;
+		}
 		if (signature != null || userId != null) {
 			String sign = userRedisUtil.getUserSignature(userId);
 			if (sign != null && signature != null && signature.equals(sign)) {
 				User user = userService.qeuryUserById(userId);
 				if (ControlAuthConstans.ONLY_SEE.equals(user.getUserRole())) {
 					InterceptorOutputMessage.outStreamMeassge(response, SystemResultCodeEnum.NO_AUTH);
+					CONTROLTERCEPTOR_LOG.info("request no auth");
 					return false;
 				}
 				return true;

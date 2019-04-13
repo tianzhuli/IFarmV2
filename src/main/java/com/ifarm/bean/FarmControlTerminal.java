@@ -8,20 +8,47 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.ifarm.annotation.Validator;
+
 @Entity
 @Table(name = "farm_control_terminal")
 public class FarmControlTerminal {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer terminalId;
+	@Validator
 	private Integer controlDeviceId;
-	private Integer systemId;
+	@Validator
+	private Integer unitId;
+	@Validator
 	private Integer controlDeviceBit;
+	@Validator
 	private String controlType;
+	@Validator
 	private String functionName;
+	@Validator
 	private String functionCode;
 	private String terminalIdentifying; // 端口标识
 	private Timestamp terminalCreateTime;
+	// 优先级，例如水肥药里面泵先启动，优先级可配置
+	@Validator
+	private String priority;
+	
+	public FarmControlTerminal() {
+		
+	}
+	
+	public FarmControlTerminal(Integer controlDeviceId, Integer controlDeviceBit) {
+		super();
+		this.controlDeviceId = controlDeviceId;
+		this.controlDeviceBit = controlDeviceBit;
+	}
+
+	public FarmControlTerminal(Integer unitId, String terminalIdentifying) {
+		super();
+		this.unitId = unitId;
+		this.terminalIdentifying = terminalIdentifying;
+	}
 
 	public Integer getTerminalId() {
 		return terminalId;
@@ -38,13 +65,13 @@ public class FarmControlTerminal {
 	public void setControlDeviceId(Integer controlDeviceId) {
 		this.controlDeviceId = controlDeviceId;
 	}
-
-	public Integer getSystemId() {
-		return systemId;
+	
+	public Integer getUnitId() {
+		return unitId;
 	}
 
-	public void setSystemId(Integer systemId) {
-		this.systemId = systemId;
+	public void setUnitId(Integer unitId) {
+		this.unitId = unitId;
 	}
 
 	public Integer getControlDeviceBit() {
@@ -93,6 +120,14 @@ public class FarmControlTerminal {
 
 	public void setTerminalCreateTime(Timestamp terminalCreateTime) {
 		this.terminalCreateTime = terminalCreateTime;
+	}
+
+	public String getPriority() {
+		return priority;
+	}
+
+	public void setPriority(String priority) {
+		this.priority = priority;
 	}
 
 }

@@ -1,9 +1,8 @@
 package com.ifarm.bean;
 
 import java.io.Serializable;
-
-import com.ifarm.util.ByteConvert;
 import com.ifarm.util.CacheDataBase;
+import com.ifarm.util.TimeHelper;
 
 public class ControlCommand implements Serializable {
 	private static final long serialVersionUID = 7909691415613846968L;
@@ -20,7 +19,7 @@ public class ControlCommand implements Serializable {
 		this.controlTerminalbits = controlTerminalbits;
 		this.controlDeviceId = controlDeviceId;
 		this.userId = controlTask.getUserId();
-		this.commandId = CacheDataBase.machineCode + String.valueOf(hashCode());
+		this.commandId = TimeHelper.now() + CacheDataBase.machineCode + String.valueOf(hashCode());
 	}
 
 	public String getUserId() {
@@ -73,34 +72,5 @@ public class ControlCommand implements Serializable {
 
 	public void setTaskId(Integer taskId) {
 		this.taskId = taskId;
-	}
-
-	public byte[] commandToByte() {
-		byte[] arr = new byte[11];
-		byte[] collectorArray = ByteConvert.convertTobyte(String.valueOf(this.controlDeviceId), false);
-		arr[0] = 0x03; // 设备类型标识，目前都是对应的通断器
-		for (int i = 0; i < collectorArray.length; i++) {
-			arr[i + 1] = collectorArray[i];
-		}
-		arr[5] = 0x01; // 主功能号
-		arr[6] = 0x00; // 次功能号
-		switch (this.commandCategory) {
-		case "execution":
-			arr[7] = 0x01;
-			arr[8] = 0x00;
-			break;
-		case "stop":
-			arr[7] = 0x02;
-			arr[8] = 0x00;
-			break;
-		default:
-			arr[7] = 0x00;
-			arr[8] = 0x00; //默认可以做查询
-			break;
-		}
-		byte[] bits = ByteConvert.terminalBitsConvert(controlTerminalbits, 2);
-		arr[9] = bits[0];
-		arr[10] = bits[1];
-		return arr;
 	}
 }

@@ -18,6 +18,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ifarm.bean.FarmCollectorDevice;
 import com.ifarm.constant.SystemResultCodeEnum;
 import com.ifarm.dao.FarmCollectorDeviceDao;
+import com.ifarm.enums.DeviceValueType;
 import com.ifarm.redis.util.FarmCollectorRedisHelper;
 import com.ifarm.util.CacheDataBase;
 import com.ifarm.util.JsonObjectUtil;
@@ -102,8 +103,14 @@ public class FarmCollectorDeviceService {
 
 	public JSONObject getCollectorDeviceParamCode(String deviceType) {
 		JSONObject jsonObject = new JSONObject();
-		jsonObject.put("header", CacheDataBase.collectorDeviceTitle.get(deviceType));
-		jsonObject.put("code", CacheDataBase.collectorDeviceTitle.get(deviceType + "UpperCode"));
+		DeviceValueType deviceValueType = DeviceValueType.getValueTypeByCode(deviceType);
+		if (deviceValueType !=null) {
+			jsonObject.put("header", deviceValueType.getParam());
+			jsonObject.put("code", deviceValueType.getParamCode());
+		} else {
+			jsonObject.put("header", CacheDataBase.collectorDeviceTitle.get(deviceType));
+			jsonObject.put("code", CacheDataBase.collectorDeviceTitle.get(deviceType + "UpperCode"));
+		}
 		return jsonObject;
 	}
 
@@ -136,6 +143,18 @@ public class FarmCollectorDeviceService {
 	}
 	
 	public String queryFarmCollectorDevices(FarmCollectorDevice farmCollectorDevice) {
-		return JsonObjectUtil.toJsonArrayString(farmCollectorDeviceDao.getDynamicList(farmCollectorDevice));
+		JSONArray jsonArray = new JSONArray();
+		List<FarmCollectorDevice> farmCollectorDeviceList = farmCollectorDeviceDao.getDynamicList(farmCollectorDevice);
+		for (int i = 0; i < farmCollectorDeviceList.size(); i++) {
+			FarmCollectorDevice fCollectorDevice = farmCollectorDeviceList.get(i);
+			JSONObject jsonObject = JsonObjectUtil.toJsonObject(fCollectorDevice);
+			jsonObject.put("deviceName", CacheDataBase.initBaseConfig.get("deviceCategory.json").getJSONObject("deviceName").get(fCollectorDevice.getDeviceType()));
+			jsonArray.add(jsonObject);
+		}
+		return jsonArray.toJSONString();
+	}
+	
+	public List<FarmCollectorDevice> queryFarmCollectorDeviceList(FarmCollectorDevice farmCollectorDevice) {
+		return farmCollectorDeviceDao.getDynamicList(farmCollectorDevice);
 	}
 }

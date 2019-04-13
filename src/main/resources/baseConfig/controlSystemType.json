@@ -1,47 +1,93 @@
 {
 	"controlSystemType": [{
-		"systemCode": "vavleControl",
-		"systemType": "vavle",
-		"systemTypeCode": "阀门控制系统"
+		"systemCode": "vavle",
+		"systemType": "阀门控制系统",
+		"systemTypeCode": "vavleControl"
 	}, {
-		"systemCode": "carbonDioxideControl",
-		"systemType": "carbonDioxide",
-		"systemTypeCode": "二氧化碳控制系统"
+		"systemCode": "carbonDioxide",
+		"systemType": "二氧化碳控制系统",
+		"systemTypeCode": "carbonDioxideControl"
 	}, {
-		"systemCode": "sideRollerShuttersControl",
-		"systemType": "rollerShutters",
-		"systemTypeCode": "侧卷帘系统"
+		"systemCode": "rollerShutters",
+		"systemType": "侧卷帘系统",
+		"systemTypeCode": "sideRollerShuttersControl"
 	}, {
-		"systemCode": "waterRollerShuttersControl",
-		"systemType": "waterRollerShutters",
-		"systemTypeCode": "水帘控制系统"
+		"systemCode": "waterRollerShutters",
+		"systemType": "水帘控制系统",
+		"systemTypeCode": "waterRollerShuttersControl"
 	}, {
-		"systemCode": "humidityControl",
-		"systemType": "humidity",
-		"systemTypeCode": "湿度控制系统"
+		"systemCode": "humidity",
+		"systemType": "湿度控制系统",
+		"systemTypeCode": "humidityControl"
 	}, {
-		"systemCode": "oxygenControl",
-		"systemType": "oxygen",
-		"systemTypeCode": "氧气控制系统"
+		"systemCode": "oxygen",
+		"systemType": "氧气控制系统",
+		"systemTypeCode": "oxygenControl"
 	}, {
-		"systemCode": "topRollerShuttersControl",
-		"systemType": "rollerShutters",
-		"systemTypeCode": "顶卷帘系统"
+		"systemCode": "rollerShutters",
+		"systemType": "顶卷帘系统",
+		"systemTypeCode": "topRollerShuttersControl"
 	}, {
-		"systemCode": "temperatureControl",
-		"systemType": "temperature",
-		"systemTypeCode": "温度控制系统"
+		"systemCode": "temperature",
+		"systemType": "温度控制系统",
+		"systemTypeCode": "temperatureControl"
 	}, {
-		"systemCode": "sunshadeControl",
-		"systemType": "sunshade",
-		"systemTypeCode": "遮阳控制系统"
+		"systemCode": "sunshade",
+		"systemType": "遮阳控制系统",
+		"systemTypeCode": "sunshadeControl"
 	}, {
-		"systemCode": "fillLightControl",
-		"systemType": "supplementaryLighting",
-		"systemTypeCode": "补光控制系统"
+		"systemCode": "supplementaryLighting",
+		"systemType": "补光控制系统",
+		"systemTypeCode": "fillLightControl"
 	}, {
-		"systemCode": "draughtFanControl",
-		"systemType": "ventilate",
-		"systemTypeCode": "通风控制系统"
-	}]
+		"systemCode": "ventilate",
+		"systemType": "通风控制系统",
+		"systemTypeCode": "draughtFanControl"
+	}, {
+	    "systemCode": "pump",
+		"systemType": "水泵控制系统",
+		"systemTypeCode": "pumpControl"
+	}],
+	"systemName": {
+		"pumpControl": "水泵控制系统",
+		"draughtFanControl": "通风控制系统",
+		"fillLightControl": "补光控制系统",
+		"sunshadeControl": "遮阳控制系统",
+		"temperatureControl": "温度控制系统",
+		"topRollerShuttersControl": "顶卷帘系统",
+		"oxygenControl": "氧气控制系统",
+		"humidityControl": "湿度控制系统",
+		"waterRollerShuttersControl": "水帘控制系统",
+		"sideRollerShuttersControl": "侧卷帘系统",
+		"carbonDioxideControl": "二氧化碳控制系统",
+		"vavleControl": "阀门控制系统",
+		"waterFertilizerMedicineControl": "水肥药控制系统"
+	},
+	"controlUnitExt": {
+	    "carbonDioxideControl": ["nodeNum"],
+		"draughtFanControl": ["nodeNum"],
+		"fillLightControl": ["nodeNum"],
+		"sideRollerShutterControl": ["nodeNum"],
+		"sunshadeControl": ["nodeNum"],
+		"topRollerShutterControl": ["nodeNum"],
+		"valveControl": ["nodeNum"],
+		"waterRollerShutterControl": ["medicineNum", "pumpNum", "fertierNum"],
+		"temperatureControl": ["riseNum","fallNum"],
+		"humidityControl" : ["nodeNum"],
+		"oxygenControl" : ["nodeNum"]
+	},
+	"swithMultiControlTask": ["waterRollerShutterControl", "temperatureControl", "humidityControl"],
+	"controlUnitTerminalIdentifying": {
+	    "carbonDioxideControl": [""],
+		"draughtFanControl": [""],
+		"fillLightControl": [""],
+		"sideRollerShutterControl": [""],
+		"sunshadeControl": [""],
+		"topRollerShutterControl": [""],
+		"valveControl": [""],
+		"waterRollerShutterControl": ["pump", "fertilizerCan", "medicineCan"],
+		"temperatureControl": ["rise","fall"],
+		"humidityControl" : ["humidity"],
+		"oxygenControl" : [""]
+	}
 }

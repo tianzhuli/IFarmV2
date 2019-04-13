@@ -7,13 +7,13 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 
-import com.ifarm.bean.CollectorDeviceValue;
+import com.ifarm.bean.DeviceValueBase;
 import com.ifarm.bean.FarmCollectorDevice;
 
 @Repository
-public class DeviceHistoryValuesDao extends BaseDao<CollectorDeviceValue> {
+public class DeviceHistoryValuesDao extends BaseDao<DeviceValueBase> {
 
-	public void saveSensorValues(CollectorDeviceValue collectorDeviceValue) {
+	public void saveSensorValues(DeviceValueBase collectorDeviceValue) {
 		Session session = getSession();
 		session.save(collectorDeviceValue);
 	}

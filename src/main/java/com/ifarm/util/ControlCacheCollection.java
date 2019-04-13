@@ -14,14 +14,14 @@ import org.springframework.stereotype.Component;
 
 import com.ifarm.bean.ControlCommand;
 import com.ifarm.bean.ControlTask;
-import com.ifarm.bean.WFMControlCommand;
-import com.ifarm.bean.WFMControlTask;
+import com.ifarm.bean.MultiControlCommand;
+import com.ifarm.bean.MultiControlTask;
 import com.ifarm.constant.ControlTaskEnum;
 import com.ifarm.redis.util.ControlCommandRedisHelper;
 import com.ifarm.redis.util.ControlTaskRedisHelper;
 import com.ifarm.redis.util.WfmControlTaskRedisHelper;
 import com.ifarm.service.ControlTaskService;
-import com.ifarm.service.WFMControlTaskService;
+import com.ifarm.service.MultiControlTaskService;
 import com.ifarm.wrapper.BooleanWrapper;
 
 /**
@@ -34,7 +34,7 @@ import com.ifarm.wrapper.BooleanWrapper;
 @Component
 public class ControlCacheCollection implements Runnable {
 	private ControlTaskService controlTaskService;
-	private WFMControlTaskService wfmControlTaskService;
+	private MultiControlTaskService wfmControlTaskService;
 	private static final Log controlCacheCollection_log = LogFactory.getLog(ControlCacheCollection.class);
 	private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private int offset = 0; // 这个就是一般的误差时间
@@ -59,12 +59,12 @@ public class ControlCacheCollection implements Runnable {
 		return controlTaskService;
 	}
 
-	public WFMControlTaskService getWfmControlTaskService() {
+	public MultiControlTaskService getWfmControlTaskService() {
 		return wfmControlTaskService;
 	}
 
 	@Autowired
-	public void setWfmControlTaskService(WFMControlTaskService wfmControlTaskService) {
+	public void setWfmControlTaskService(MultiControlTaskService wfmControlTaskService) {
 		this.wfmControlTaskService = wfmControlTaskService;
 	}
 
@@ -117,7 +117,7 @@ public class ControlCacheCollection implements Runnable {
 
 	}
 
-	public void recoverStopControlTask(WFMControlTask wTask, String userId, BooleanWrapper booleanWrapper, boolean isStop, boolean isUpdateTask) {
+	public void recoverStopControlTask(MultiControlTask wTask, String userId, BooleanWrapper booleanWrapper, boolean isStop, boolean isUpdateTask) {
 		try {
 			if (isStop) {
 				wfmControlTaskRedisHelper.removeWfmControlTask(userId, wTask.getControllerLogId());
@@ -160,16 +160,16 @@ public class ControlCacheCollection implements Runnable {
 		}
 	}
 
-	public void wfmClearControlTaskCommand(WFMControlTask wfmControlTask) {
+	public void wfmClearControlTaskCommand(MultiControlTask wfmControlTask) {
 		commandRedisHelper.removeWfmControlCommand(wfmControlTask);
 	}
 
-	public void wfmControlTaskStopCommandProduce(WFMControlTask wfmControlTask) throws Exception {
+	public void wfmControlTaskStopCommandProduce(MultiControlTask wfmControlTask) throws Exception {
 		wfmControlTask.setLevel(3);
 		wfmControlTask.setStartStopTime(System.currentTimeMillis() / 1000);
-		List<WFMControlCommand> list = wfmControlTask.getWfmControlCommands();
+		List<MultiControlCommand> list = wfmControlTask.getWfmControlCommands();
 		for (int i = list.size() - 1; i >= 0; i--) {
-			WFMControlCommand command = list.get(i);
+			MultiControlCommand command = list.get(i);
 			Long collectorId = command.getCollectorId();
 			command.setCommandCategory("stop");
 			if (collectorId != null) {
@@ -202,7 +202,7 @@ public class ControlCacheCollection implements Runnable {
 								long timeDev = Timestamp.valueOf(format.format(new Date())).getTime() / 1000
 										- controlTask.getStartExecutionTime().getTime() / 1000;
 								if (timeDev > 0) { // 执行任务的时间到了
-									if (!ControlHandlerUtil.judgeControlTaskConflict(controlTask, true)) {
+									//if (!ControlHandlerUtil.judgeControlTaskConflict(controlTask, true)) {
 										controlTask.setTaskState(ControlTaskEnum.BLOCKING); // 任务下发，不一定真的执行了
 										controlTask.setStartExecutionTime(Timestamp.valueOf(format.format(new Date())));
 										ControlCommand command = controlTask.buildCommand("execution");
@@ -216,11 +216,11 @@ public class ControlCacheCollection implements Runnable {
 										// controlTask.pushUserMessage());//
 										// 通知用户
 										controlCacheCollection_log.info(userId + "---发现到了时间应该执行的任务---");
-									} else {
+									/*} else {
 										// controlCacheCollection_log.info(userId
 										// + "---任务冲突---");
 										controlTask.setTaskState(ControlTaskEnum.CONFICTING);
-									}
+									}*/
 								}
 							}
 							Long collectorId = controlTask.getCollectorId();
@@ -300,9 +300,9 @@ public class ControlCacheCollection implements Runnable {
 				for (String key : wfmSet) {
 					String[] splitArray = key.split("_");
 					String userId = splitArray[splitArray.length - 1];
-					List<WFMControlTask> controlTasks = wfmControlTaskRedisHelper.getRedisListValues(userId);
+					List<MultiControlTask> controlTasks = wfmControlTaskRedisHelper.getRedisListValues(userId);
 					for (int index = 0; index < controlTasks.size(); index++) {
-						WFMControlTask wfmControlTask = controlTasks.get(index);
+						MultiControlTask wfmControlTask = controlTasks.get(index);
 						BooleanWrapper flat = new BooleanWrapper();
 						try {
 							String taskState = wfmControlTask.getTaskState();
@@ -310,12 +310,12 @@ public class ControlCacheCollection implements Runnable {
 								long timeDev = Timestamp.valueOf(format.format(new Date())).getTime() / 1000
 										- wfmControlTask.getStartExecutionTime().getTime() / 1000;
 								if (timeDev > 0) { // 执行任务的时间到了
-									if (!ControlHandlerUtil.wfmJudgeControlTaskConflict(wfmControlTask, true)) {
+									//if (!ControlHandlerUtil.wfmJudgeControlTaskConflict(wfmControlTask, true)) {
 										wfmControlTask.setTaskState(ControlTaskEnum.BLOCKING); // 任务下发，不一定真的执行了
 										wfmControlTask.setStartExecutionTime(Timestamp.valueOf(format.format(new Date())));
-										List<WFMControlCommand> list = wfmControlTask.getWfmControlCommands();
+										List<MultiControlCommand> list = wfmControlTask.getWfmControlCommands();
 										for (int i = 0; i < list.size(); i++) {
-											WFMControlCommand wfmControlCommand = list.get(i);
+											MultiControlCommand wfmControlCommand = list.get(i);
 											Long collectorId = wfmControlCommand.getCollectorId();
 											if (collectorId != null) {
 												commandRedisHelper.setCommandRedisListValue(collectorId.toString(), wfmControlCommand);
@@ -323,11 +323,11 @@ public class ControlCacheCollection implements Runnable {
 											CacheDataBase.ioControlData.notifyObservers(collectorId); // 推送到长连接设备
 										}
 										controlCacheCollection_log.info(userId + "---发现到了时间应该执行的任务---");
-									} else {
+									/*} else {
 										// controlCacheCollection_log.info(userId
 										// + "---任务冲突---");
 										wfmControlTask.setTaskState(ControlTaskEnum.CONFICTING);
-									}
+									}*/
 								}
 							}
 							if (wfmControlTask.isStopReceived()) {
@@ -393,7 +393,7 @@ public class ControlCacheCollection implements Runnable {
 						} catch (Exception e) {
 							// TODO: handle exception
 							e.printStackTrace();
-							controlCacheCollection_log.error("回收对象异常：" + e);
+							controlCacheCollection_log.error("回收对象异常：", e);
 							recoverStopControlTask(wfmControlTask, userId, flat, true, true);
 							// 清除异常的任务
 						}

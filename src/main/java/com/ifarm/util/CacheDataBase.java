@@ -1,5 +1,7 @@
 package com.ifarm.util;
 
+import io.netty.channel.ChannelHandlerContext;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,24 +48,31 @@ import com.ifarm.service.CollectorDeviceValueService;
 import com.ifarm.service.ControlTaskService;
 import com.ifarm.service.FarmControlSystemService;
 import com.ifarm.service.FarmControlSystemWFMService;
-import com.ifarm.service.WFMControlTaskService;
+import com.ifarm.service.FarmControlUnitService;
+import com.ifarm.service.MultiControlTaskService;
 
 public class CacheDataBase {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(CacheDataBase.class);
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(CacheDataBase.class);
 
 	public static int timeout = 1000 * 60;
 	public static boolean receiveFlat = true;
 	public static Object sensorcachelock = new Object();
 	public static String machineCode = "101";
-	public static Integer collectorTime = 10; //分钟
-	
+	public static Integer collectorTime = 10; // 分钟
+	public static Integer commandDelayTime = 3;
+	public static Integer collectorVersion = 2;
+	public static boolean collectorCommandOpen = true;
+
 	public static Map<String, String> sensorParamCodeMap = new HashMap<String, String>(); // 传感器code和类型的对应
 	public static Map<String, JSONArray> topicThemeMap = new HashMap<String, JSONArray>();
 	public static Map<String, Byte> controlBaseCommand = new HashMap<String, Byte>(); // 控制的基础命名
 	public static Map<String, String> collectorDeviceTitle = new HashMap<String, String>(); // 采集设备的表头
 	public static Map<String, String> collectorDeviceUnit = new HashMap<String, String>(); // 采集设备的参数对应的单位
-
+	public static Map<Long, Long> collectorLastCommandTimeMap = new ConcurrentHashMap<>(); // 采集设备上次指令下方时间
+	public static Map<String, Object> systemConfigCacheMap = new ConcurrentHashMap<String, Object>(); // 系统配置缓存
+	public static Map<Long, ChannelHandlerContext> channelHandlerContextMap = new ConcurrentHashMap<>();
 	/**
 	 * 初始化的data
 	 */
@@ -116,19 +125,23 @@ public class CacheDataBase {
 	 * 线程池的配置
 	 */
 	public static ExecutorService service = Executors.newFixedThreadPool(20);
-	public static ExecutorService controlService = Executors.newFixedThreadPool(20);
-	public static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(20, 50, 60, TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>(10));
-	public static ScheduledExecutorService scheduled = Executors.newSingleThreadScheduledExecutor();
+	public static ExecutorService controlService = Executors
+			.newFixedThreadPool(20);
+	public static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(20,
+			50, 60, TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>(10));
+	public static ScheduledExecutorService scheduled = Executors
+			.newSingleThreadScheduledExecutor();
 	/**
 	 * 静态的service、dao变量
 	 */
 	public static ControlCacheCollection cacheCollection;// 回收控制对象的线程
-	public static CollectorDeviceValueService sensorValuesService;
+	public static CollectorDeviceValueService collectorDeviceValueService;
 	public static ControlTaskService taskService;
-	public static WFMControlTaskService wTaskService;
+	public static MultiControlTaskService wTaskService;
 	public static InitRedisDao initRedisDao;
 	public static FarmControlSystemService farmControlSystemService;
 	public static FarmControlSystemWFMService farmControlSystemWFMService;
+	public static FarmControlUnitService farmControlUnitService;
 	public static ControlCommandRedisHelper commandRedisHelper;
 	public static ControlTaskRedisHelper controlTaskRedisHelper;
 	public static WfmControlTaskRedisHelper wfmControlTaskRedisHelper;
@@ -168,46 +181,65 @@ public class CacheDataBase {
 
 	public static void loadProperties() throws IOException {
 		Properties properties = new Properties();
-		properties.load(CacheDataBase.class.getClassLoader().getResourceAsStream("com/ifarm/util/baseInformation.properties"));
+		properties.load(CacheDataBase.class.getClassLoader()
+				.getResourceAsStream(
+						"com/ifarm/util/baseInformation.properties"));
 		userImagePath = imageSavePath + properties.getProperty("userImagePath");
 		farmImagePath = imageSavePath + properties.getProperty("farmImagePath");
 		farmLabel = properties.getProperty("farmLabel");
 		port = Integer.valueOf(properties.getProperty("tcp.port"));
-		controlPort = Integer.valueOf(properties.getProperty("tcp.controlPort"));
+		controlPort = Integer
+				.valueOf(properties.getProperty("tcp.controlPort"));
 		configData = properties.getProperty("collector.data");
 		configSensor = properties.getProperty("collector.sensor");
 		configIp = properties.getProperty("collector.ipConfig");
 		configTime = properties.getProperty("collector.time");
 		configStop = properties.getProperty("collector.stop");
 		cacheSize = Integer.parseInt(properties.getProperty("cacheSize"));
-		cacheCollection.setOffset(Integer.parseInt(properties.getProperty("offset")));
-		cacheCollection.setTimeout(Integer.parseInt(properties.getProperty("timeout")));
+		collectorCommandOpen = Boolean.parseBoolean(properties
+				.getProperty("collectorCommandOpen"));
+		cacheCollection.setOffset(Integer.parseInt(properties
+				.getProperty("offset")));
+		cacheCollection.setTimeout(Integer.parseInt(properties
+				.getProperty("timeout")));
+		collectorVersion = Integer.parseInt(properties
+				.getProperty("collectorVerion"));
+		collectorTime = Integer.parseInt(properties
+				.getProperty("collectorTime"));
 		LOGGER.info("port:" + port);
 		LOGGER.info("imagePath:" + userImagePath + " and " + farmImagePath);
-		LOGGER.info("config:" + configData + "、" + configSensor + "、" + configIp + "、" + configTime + "、" + configStop);
+		LOGGER.info("config:" + configData + "、" + configSensor + "、"
+				+ configIp + "、" + configTime + "、" + configStop);
 		Properties sensorProperties = new Properties();
-		sensorProperties.load(CacheDataBase.class.getClassLoader().getResourceAsStream("com/ifarm/util/sensor.properties"));
+		sensorProperties.load(CacheDataBase.class.getClassLoader()
+				.getResourceAsStream("com/ifarm/util/sensor.properties"));
 		Enumeration<Object> enumeration = sensorProperties.keys();
 		while (enumeration.hasMoreElements()) {
 			String key = (String) enumeration.nextElement();
 			sensorParamCodeMap.put(key, sensorProperties.getProperty(key));
 		}
 		Properties collectorHeaderProperties = new Properties();
-		collectorHeaderProperties.load(CacheDataBase.class.getClassLoader().getResourceAsStream("com/ifarm/util/collectorDeviceTitle.properties"));
-		Enumeration<Object> headerEnumeration = collectorHeaderProperties.keys();
+		collectorHeaderProperties.load(CacheDataBase.class.getClassLoader()
+				.getResourceAsStream(
+						"com/ifarm/util/collectorDeviceTitle.properties"));
+		Enumeration<Object> headerEnumeration = collectorHeaderProperties
+				.keys();
 		while (headerEnumeration.hasMoreElements()) {
 			String key = (String) headerEnumeration.nextElement();
-			collectorDeviceTitle.put(key, collectorHeaderProperties.getProperty(key));
+			collectorDeviceTitle.put(key,
+					collectorHeaderProperties.getProperty(key));
 		}
 		LOGGER.info("collectorDeviceTitle" + collectorDeviceTitle);
 	}
 
-	public static Map<String, JSONObject> loadDataBaseTableString(Connection con, String table) throws SQLException {
+	public static Map<String, JSONObject> loadDataBaseTableString(
+			Connection con, String table) throws SQLException {
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
 		Map<String, JSONObject> map = new ConcurrentHashMap<>();
 		try {
-			preparedStatement = con.prepareStatement("SELECT * FROM `" + table + "`");
+			preparedStatement = con.prepareStatement("SELECT * FROM `" + table
+					+ "`");
 			resultSet = preparedStatement.executeQuery();
 			ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
 			int column = resultSetMetaData.getColumnCount();
@@ -216,7 +248,8 @@ public class CacheDataBase {
 				String key = resultSet.getString(1);
 				for (int i = 1; i <= column; i++) {
 					if (resultSet.getObject(i) != null) {
-						jsonObject.put(resultSetMetaData.getColumnName(i), resultSet.getObject(i).toString());
+						jsonObject.put(resultSetMetaData.getColumnName(i),
+								resultSet.getObject(i).toString());
 					}
 				}
 				map.put(key, jsonObject);
@@ -235,7 +268,8 @@ public class CacheDataBase {
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
 		try {
-			StringBuffer stringBuffer = new StringBuffer("select * from topic order by topicTheme");
+			StringBuffer stringBuffer = new StringBuffer(
+					"select * from topic order by topicTheme");
 			preparedStatement = con.prepareStatement(stringBuffer.toString());
 			resultSet = preparedStatement.executeQuery();
 			ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
@@ -245,7 +279,8 @@ public class CacheDataBase {
 				JSONObject jsonObject = new JSONObject();
 				for (int i = 3; i <= column; i++) {
 					if (resultSet.getObject(i) != null) {
-						jsonObject.put(resultSetMetaData.getColumnName(i), resultSet.getObject(i).toString());
+						jsonObject.put(resultSetMetaData.getColumnName(i),
+								resultSet.getObject(i).toString());
 					}
 				}
 				if (topicThemeMap.containsKey(topicTheme)) {
@@ -267,20 +302,61 @@ public class CacheDataBase {
 
 	}
 
+	public static void loadSystemConfigCache(Connection con)
+			throws SQLException {
+		systemConfigCacheMap.clear();
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
+		try {
+			StringBuffer stringBuffer = new StringBuffer(
+					"select * from  system_config_cache");
+			preparedStatement = con.prepareStatement(stringBuffer.toString());
+			resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				String configKey = resultSet.getString(2);
+				String configValue = resultSet.getString(3);
+				String valueType = resultSet.getString(4);
+				if (StringUtil.equals("String", valueType)) {
+					systemConfigCacheMap.put(configKey, configKey);
+				} else if (StringUtil.equals("Integer", valueType)) {
+					systemConfigCacheMap.put(configKey,
+							Integer.valueOf(configValue));
+				} else if (StringUtil.equals("Boolean", valueType)) {
+					systemConfigCacheMap.put(configKey,
+							Boolean.valueOf(configValue));
+				} else if (StringUtil.equals("JSONObject", valueType)) {
+					systemConfigCacheMap.put(configKey,
+							JSONObject.parse(configValue));
+				}
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		} finally {
+			LOGGER.info("topics:" + topicThemeMap);
+			preparedStatement.close();
+			resultSet.close();
+		}
+
+	}
+
 	@SuppressWarnings("static-access")
-	public static void loadMqttService() throws MqttException, UnsupportedEncodingException {
+	public static void loadMqttService() throws MqttException,
+			UnsupportedEncodingException {
 		for (int i = 0; i < mqttService.topics.length; i++) {
 			String topic = mqttService.topics[i];
 			mqttService.message = new MqttMessage();
 			mqttService.message.setQos(Integer.valueOf(mqttService.qos[i]));
 			mqttService.message.setRetained(true);
-			mqttService.message.setPayload(topicThemeMap.get(topic).toString().getBytes("UTF-8"));
+			mqttService.message.setPayload(topicThemeMap.get(topic).toString()
+					.getBytes("UTF-8"));
 			mqttService.publish(mqttService.mqttTopics[i], mqttService.message);
 		}
 	}
 
 	public static void loadInitBaseConfig() {
-		String baseConfigPath = CacheDataBase.class.getClassLoader().getResource("./baseConfig").getPath();
+		String baseConfigPath = CacheDataBase.class.getClassLoader()
+				.getResource("./baseConfig").getPath();
 		baseConfigPath = baseConfigPath.replace("%20", " ");
 		File baseConfigFile = new File(baseConfigPath);
 		File[] configFiles = baseConfigFile.listFiles();
@@ -288,7 +364,8 @@ public class CacheDataBase {
 			BufferedReader bufferedReader;
 			InputStreamReader inputStreamReader = null;
 			try {
-				inputStreamReader = new InputStreamReader(new FileInputStream(file), "UTF-8");
+				inputStreamReader = new InputStreamReader(new FileInputStream(
+						file), "UTF-8");
 				bufferedReader = new BufferedReader(inputStreamReader);
 				StringBuilder builder = new StringBuilder();
 				String line;
@@ -313,12 +390,14 @@ public class CacheDataBase {
 			}
 		}
 	}
+	
 
 	public static void initialize() throws Exception {
 		ConDb conDb = new ConDb();
 		Connection con = conDb.openCon();
 		loadProperties();
 		loadTopics(con);
+		loadSystemConfigCache(con);
 		con.close();
 		loadInitBaseConfig();
 		// CacheDataBase.initRedisDao.redisConnect();
@@ -334,5 +413,4 @@ public class CacheDataBase {
 		 */
 	}
 
-	
 }

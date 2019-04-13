@@ -17,6 +17,6 @@ public class UploadProcessController {
 	public @ResponseBody
 	String getProcess(@RequestParam("userId") String userId, HttpSession session) {
 		ProgressEntity progressEntity = (ProgressEntity) session.getAttribute(userId);
-		return JsonObjectUtil.toJsonObjectString(progressEntity).toJSONString();
+		return JsonObjectUtil.toJsonObject(progressEntity).toJSONString();
 	}
 }

@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +17,8 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import com.ifarm.bean.Farm;
+import com.ifarm.bean.FarmPosition;
+import com.ifarm.bean.FarmRegion;
 import com.ifarm.service.FarmService;
 import com.ifarm.service.UserLogService;
 import com.ifarm.util.FileUtil;
@@ -52,6 +55,7 @@ public class FarmController {
 	}
 
 	@RequestMapping(value = "getUserAroundFarmList")
+	@CrossOrigin
 	public String getUserAroundFarmList(@RequestParam("aroundPersonId") String aroundPersonId) {
 		return farmService.getUserAroundFarmList(aroundPersonId);
 	}
@@ -63,6 +67,7 @@ public class FarmController {
 	 * @return
 	 */
 	@RequestMapping(value = "farmsList")
+	@CrossOrigin
 	public String getFarmList(String userId) {
 		return farmService.getFarmsList(userId);
 	}
@@ -124,5 +129,41 @@ public class FarmController {
 			userLogService.saveUserLog(request, farm, userId, "update", "farm", "success");
 			return "success";
 		}
+	}
+	
+	@RequestMapping("region/addition")
+	@CrossOrigin
+	public String addFarmRegion(FarmRegion farmRegion) {
+		return farmService.addFarmRegion(farmRegion);
+	}
+	
+	@RequestMapping("region/queryList")
+	@CrossOrigin
+	public String queryFarmRegionList(FarmRegion farmRegion) {
+		return farmService.queryFarmRegionList(farmRegion);
+	}
+	
+	@RequestMapping("region/delete")
+	@CrossOrigin
+	public String deleteFarmRegion(FarmRegion farmRegion) {
+		return farmService.deleteRegion(farmRegion);
+	}
+	
+	@RequestMapping("position/addition")
+	@CrossOrigin
+	public String addFarmPosition(FarmPosition farmPosition) {
+		return farmService.addFarmPosition(farmPosition);
+	}
+	
+	@RequestMapping("position/queryList")
+	@CrossOrigin
+	public String queryFarmPosition(FarmPosition farmPosition) {
+		return farmService.queryFarmPosition(farmPosition);
+	}
+	
+	@RequestMapping("position/delete")
+	@CrossOrigin
+	public String deleteFarmPosition(FarmPosition farmPosition) {
+		return farmService.deleteFarmPosition(farmPosition);
 	}
 }

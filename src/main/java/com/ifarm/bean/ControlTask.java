@@ -12,29 +12,39 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ifarm.annotation.Validator;
 import com.ifarm.constant.ControlTaskEnum;
 import com.ifarm.util.CacheDataBase;
 import com.ifarm.util.JsonObjectUtil;
 import com.ifarm.util.TimeHelper;
 
 @Entity
-@Table(name = "farm_controller_log")
+@Table(name = "farm_controller_task")
 public class ControlTask implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer controllerLogId; // 编号
+	@Validator
 	private String userId; // 下发控制的人，后期消息推送到该用户
+	@Validator
 	private Integer farmId;
 	private String farmName;
-	private String systemDistrict;
-	private String systemNo;
+	@Validator
+	private String unitDistrict;
+	@Validator
+	private String unitNo;
 	private Integer controlDeviceId; // 后期需要考虑一个控制系统的一个任务是不是会涉及到多个设备的同时操作，但是多个设备同时操作需要多条指令回复，存在不一致问题，需要考虑
-	private Integer systemId; // 控制系统Id
+	@Validator
+	private Integer unitId; // 控制系统Id
+	@Validator
 	private String controlType; // 控制类型（施肥、灌溉、卷帘、遮阳等等）
+	@Validator
 	private String controlOperation; // 控制的具体操作，比如卷帘升降
+	@Validator
 	private String functionName; // 操作的名称
 	@Transient
 	private Integer level; // 命令等级（手动停止为4最高等级，其次为自动停止、往下以此为立即执行和定时执行）
+	@Validator
 	private Integer executionTime; // 执行时间
 	private Timestamp startExecutionTime; // 开始执行的时间
 	// 推送和查询分界线
@@ -181,20 +191,20 @@ public class ControlTask implements Serializable {
 		this.farmName = farmName;
 	}
 
-	public String getSystemDistrict() {
-		return systemDistrict;
+	public String getUnitDistrict() {
+		return unitDistrict;
 	}
 
-	public void setSystemDistrict(String systemDistrict) {
-		this.systemDistrict = systemDistrict;
+	public void setUnitDistrict(String unitDistrict) {
+		this.unitDistrict = unitDistrict;
 	}
 
-	public String getSystemNo() {
-		return systemNo;
+	public String getUnitNo() {
+		return unitNo;
 	}
 
-	public void setSystemNo(String systemNo) {
-		this.systemNo = systemNo;
+	public void setUnitNo(String unitNo) {
+		this.unitNo = unitNo;
 	}
 
 	public String getFunctionName() {
@@ -253,12 +263,12 @@ public class ControlTask implements Serializable {
 		this.controlDeviceId = controlDeviceId;
 	}
 
-	public Integer getSystemId() {
-		return systemId;
+	public Integer getUnitId() {
+		return unitId;
 	}
 
-	public void setSystemId(Integer systemId) {
-		this.systemId = systemId;
+	public void setUnitId(Integer untiId) {
+		this.unitId = untiId;
 	}
 
 	public int[] getControlTerminalbits() {
@@ -289,10 +299,12 @@ public class ControlTask implements Serializable {
 		ControlCommand command = null;
 		if ("execution".equals(type)) {
 			commandCategory = "execution";
-			command = new ControlCommand(this, commandCategory, controlTerminalbits, controlDeviceId);
+			command = new ControlCommand(this, commandCategory,
+					controlTerminalbits, controlDeviceId);
 		} else if ("stop".equals(type)) {
 			commandCategory = "stop";
-			command = new ControlCommand(this, commandCategory, controlTerminalbits, controlDeviceId);
+			command = new ControlCommand(this, commandCategory,
+					controlTerminalbits, controlDeviceId);
 		} else {
 			command = new ControlCommand();
 		}
@@ -308,13 +320,16 @@ public class ControlTask implements Serializable {
 		JSONObject jsonObject = JsonObjectUtil.fromBean(this, 13);
 		jsonObject.put("taskState", this.taskState);
 		jsonObject.put("taskTime", this.taskTime.toString());
-		jsonObject.put("systemType", CacheDataBase.farmControlSystemService.getFarmControlSystemById(systemId).getSystemType());
+		jsonObject.put("systemType", CacheDataBase.farmControlUnitService
+				.queryValById(unitId, FarmControlUnit.class).getSystemType());
 		if (ControlTaskEnum.WAITTING.equals(taskState)) {
 			long currentTime = System.currentTimeMillis() / 1000;
-			jsonObject.put("remainWaitTime", startExecutionTime.getTime() / 1000 - currentTime);
+			jsonObject.put("remainWaitTime", startExecutionTime.getTime()
+					/ 1000 - currentTime);
 			return jsonObject;
 		} else if (ControlTaskEnum.EXECUTING.equals(taskState)) {
-			jsonObject.put("addResultTime", TimeHelper.secondConvertTime(this.addResultTime));
+			jsonObject.put("addResultTime",
+					TimeHelper.secondConvertTime(this.addResultTime));
 			long currentTime = System.currentTimeMillis() / 1000;
 			long offset = currentTime - this.addResultTime - this.executionTime;
 			if (offset > 0) {
@@ -323,7 +338,14 @@ public class ControlTask implements Serializable {
 				jsonObject.put("remainExecutionTime", -offset);
 			}
 		} else if (ControlTaskEnum.STOPPING.equals(taskState)) {
-			jsonObject.put("startStopTime", TimeHelper.secondConvertTime(this.startStopTime));
+			jsonObject.put("startStopTime",
+					TimeHelper.secondConvertTime(this.startStopTime));
+		}
+		FarmControlUnit farmControlUnit = CacheDataBase.farmControlUnitService
+				.queryValById(this.unitId, FarmControlUnit.class);
+		if (farmControlUnit != null) {
+			jsonObject.put("unitDistrict", farmControlUnit.getUnitDistrict());
+			jsonObject.put("unitPosition", farmControlUnit.getUnitPosition());
 		}
 		return jsonObject;
 	}
@@ -338,12 +360,15 @@ public class ControlTask implements Serializable {
 		jsonObject.put("response", responseMessage);
 		jsonObject.put("taskState", taskState);
 		jsonObject.put("taskTime", this.taskTime.toString());
-		jsonObject.put("systemType", CacheDataBase.farmControlSystemService.getFarmControlSystemById(systemId).getSystemType());
+		jsonObject.put("systemType", CacheDataBase.farmControlUnitService
+				.queryValById(unitId, FarmControlUnit.class).getSystemType());
 		if (stopReceived) {
-			jsonObject.put("stopTime", TimeHelper.secondConvertTime(this.stopTime));
+			jsonObject.put("stopTime",
+					TimeHelper.secondConvertTime(this.stopTime));
 		}
 		if (addReceived) {
-			jsonObject.put("addResultTime", TimeHelper.secondConvertTime(this.addResultTime));
+			jsonObject.put("addResultTime",
+					TimeHelper.secondConvertTime(this.addResultTime));
 		}
 		return jsonObject.toString();
 	}

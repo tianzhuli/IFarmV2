@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,6 +42,7 @@ public class UserController{
 	private static final Logger USER_CONTROLLER_LOG = LoggerFactory.getLogger(UserController.class);
 
 	@RequestMapping(value = "login")
+	@CrossOrigin
 	public String userLogin(@RequestParam("token") String token, HttpServletRequest request, User user) {
 		String returnMessage = userService.userLogin(user, token);
 		userLogService.saveUserLog(request, user, "login", "user", returnMessage);
@@ -56,6 +58,7 @@ public class UserController{
 	}
 
 	@RequestMapping(value = "getUserToken")
+	@CrossOrigin
 	@FarmControllerLog(value = "getUserToken", param = "user")
 	public String userGetToken(String userId) {
 		return userService.userGetToken(userId);

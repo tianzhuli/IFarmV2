@@ -10,9 +10,13 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.ifarm.bean.Farm;
+import com.ifarm.bean.FarmPosition;
+import com.ifarm.bean.FarmRegion;
 import com.ifarm.bean.UserFarmAuthority;
 import com.ifarm.constant.SystemResultCodeEnum;
 import com.ifarm.dao.FarmDao;
+import com.ifarm.dao.FarmPositionDao;
+import com.ifarm.dao.FarmRegionDao;
 import com.ifarm.dao.UserDao;
 import com.ifarm.dao.UserFarmAuthorityDao;
 import com.ifarm.util.JsonObjectUtil;
@@ -25,6 +29,12 @@ public class FarmService {
 
 	@Autowired
 	private UserDao userDao;
+	
+	@Autowired
+	private FarmRegionDao farmRegionDao;
+	
+	@Autowired
+	private FarmPositionDao farmPositionDao;
 
 	@Autowired
 	private UserFarmAuthorityDao userFarmAuthorityDao;
@@ -33,9 +43,11 @@ public class FarmService {
 	
 	public String saveFarm(Farm farm) {
 		farm.setFarmCreateTime(Timestamp.valueOf(simpleDateFormat.format(new Date())));
-		if (farmDao.saveBase(farm)) {
+		try {
+			farmDao.saveBase(farm);
 			return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.SUCCESS);
-		} else {
+		} catch (Exception e) {
+			// TODO: handle exception
 			return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.ERROR);
 		}
 	}
@@ -70,5 +82,41 @@ public class FarmService {
 
 	public String getUserAroundFarmList(String aroundPersonId) {
 		return JsonObjectUtil.toJsonArrayString(farmDao.getFarmsList(aroundPersonId));
+	}
+	
+	public String addFarmRegion(FarmRegion farmRegion) {
+		farmRegionDao.saveBase(farmRegion);
+		return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.SUCCESS); 
+	}
+	
+	public String queryFarmRegionList(FarmRegion farmRegion) {
+		List<FarmRegion> farmRegions = farmRegionDao.getDynamicList(farmRegion);
+		return JsonObjectUtil.toJsonArray(farmRegions).toJSONString();
+	}
+	
+	public String deleteRegion(FarmRegion farmRegion) {
+		List<FarmRegion> farmRegions = farmRegionDao.getDynamicList(farmRegion);
+		for (int i = 0; i < farmRegions.size(); i++) {
+			farmRegionDao.deleteBase(farmRegions.get(i));
+		}
+		return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.SUCCESS); 
+	}
+	
+	public String addFarmPosition(FarmPosition farmPosition) {
+		farmPositionDao.saveBase(farmPosition);
+		return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.SUCCESS); 
+	}
+	
+	public String queryFarmPosition(FarmPosition farmPosition) {
+		List<FarmPosition> list = farmPositionDao.getDynamicList(farmPosition);
+		return JsonObjectUtil.toJsonArray(list).toJSONString();
+	}
+	
+	public String deleteFarmPosition(FarmPosition farmPosition) {
+		List<FarmPosition> list = farmPositionDao.getDynamicList(farmPosition);
+		for (int i = 0; i < list.size(); i++) {
+			farmPositionDao.deleteBase(list.get(i));
+		}
+		return SystemResultEncapsulation.resultCodeDecorate(SystemResultCodeEnum.SUCCESS); 
 	}
 }

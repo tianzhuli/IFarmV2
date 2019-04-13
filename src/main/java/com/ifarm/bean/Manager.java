@@ -1,5 +1,8 @@
 package com.ifarm.bean;
 
+/**
+ * manager是指各类管理人员
+ */
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -14,6 +17,7 @@ public class Manager {
 	private String managerId;
 	private String managerName;
 	private String managerPwd;
+	private String roler;
 
 	public String getManagerId() {
 		return managerId;
@@ -38,5 +42,12 @@ public class Manager {
 	public void setManagerPwd(String managerPwd) {
 		this.managerPwd = managerPwd;
 	}
+	
+	public String getRoler() {
+		return roler;
+	}
 
+	public void setRoler(String roler) {
+		this.roler = roler;
+	}
 }
