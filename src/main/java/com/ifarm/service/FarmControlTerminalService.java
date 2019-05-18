@@ -13,11 +13,12 @@ import com.ifarm.bean.FarmControlUnit;
 import com.ifarm.dao.FarmControlDeviceDao;
 import com.ifarm.dao.FarmControlTerminalDao;
 import com.ifarm.dao.FarmControlUnitDao;
-import com.ifarm.enums.ControlSystemEnum;
 import com.ifarm.enums.SystemReturnCodeEnum;
 import com.ifarm.exception.ValidatorException;
+import com.ifarm.util.BaseIfarmUtil;
 import com.ifarm.util.CacheDataBase;
 import com.ifarm.util.JsonObjectUtil;
+import com.ifarm.util.StringUtil;
 import com.ifarm.util.SystemResultEncapsulation;
 
 @Service
@@ -31,7 +32,8 @@ public class FarmControlTerminalService extends
 	@Autowired
 	private FarmControlUnitDao farmControlUnitDao;
 
-	String[] controlTerminalKeys = { "functionName", "functionCode" };
+	String[] controlTerminalKeys = { "functionName", "functionCode",
+			"terminalNoArray" };
 
 	String[] wfmFunctionName = { "灌溉", "施肥", "施药" };
 
@@ -39,16 +41,47 @@ public class FarmControlTerminalService extends
 
 	public String getFarmControlOperationList(
 			FarmControlTerminal farmControlTerminal) {
-		List list = farmControlTerminalDao
-				.getFarmControlOperationList(farmControlTerminal);
+		List<FarmControlTerminal> farmControlTerminals = farmControlTerminalDao
+				.getDynamicList(farmControlTerminal);
 		FarmControlUnit farmControlUnit = farmControlUnitDao.getTById(
 				farmControlTerminal.getUnitId(), FarmControlUnit.class);
-		if (list.size() <= 0 || farmControlUnit == null) {
+		if (farmControlTerminals.size() <= 0 || farmControlUnit == null) {
 			throw new ValidatorException("unit terminal no config");
 		}
-		return CacheDataBase.initBaseConfig.get("terminalType.json")
-				.getJSONObject("ControlOperation")
-				.getJSONArray(farmControlUnit.getSystemType()).toString();
+		JSONArray jsonArray = new JSONArray();
+		JSONObject resultJsonObject = new JSONObject();
+		JSONObject functionCodeJsonObject = new JSONObject();
+		JSONObject terminalJsonObject = new JSONObject();
+		for (FarmControlTerminal terminal : farmControlTerminals) {
+			if (StringUtil.equals(farmControlUnit.getSystemCode(),
+					terminal.getControlType())
+					&& terminal.getPreBoot()) {
+				if (!functionCodeJsonObject.containsKey(terminal
+						.getFunctionCode())) {
+					functionCodeJsonObject.put(terminal.getFunctionCode(),
+							terminal.getFunctionName());
+					JSONArray array = new JSONArray();
+					array.add(terminal.getTerminalNo());
+					terminalJsonObject.put(terminal.getFunctionCode(), array);
+				} else {
+					terminalJsonObject.getJSONArray(terminal.getFunctionCode())
+							.add(terminal.getTerminalNo());
+				}
+			}
+		}
+		for (String functionCode : functionCodeJsonObject.keySet()) {
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put(controlTerminalKeys[0], functionCode);
+			jsonObject.put(controlTerminalKeys[1],
+					functionCodeJsonObject.get(functionCode));
+			jsonObject.put(controlTerminalKeys[2],
+					terminalJsonObject.getJSONArray(functionCode));
+			jsonArray.add(jsonObject);
+		}
+		resultJsonObject.put("operations", jsonArray);
+		resultJsonObject.put("isEnableMultiFunction", BaseIfarmUtil
+				.isEnableMultiFunction(farmControlUnit.getSystemType()));
+		return jsonArray.toString();
 	}
 
 	public String saveFarmControlTerminal(
@@ -77,18 +110,17 @@ public class FarmControlTerminalService extends
 					SystemReturnCodeEnum.UNIQUE_ERROR, null,
 					"exist same controlId and bit");
 		}
-		if (ControlSystemEnum.WATER_FERTILIZER_MEDICINDE
-				.equals(ControlSystemEnum.getValueByType(farmControlTerminal
-						.getControlType()))) {
+		if (BaseIfarmUtil.isPreBoot(farmControlUnit.getSystemType())) {
 			FarmControlTerminal identifyingTerminal = new FarmControlTerminal(
 					farmControlTerminal.getUnitId(),
-					farmControlTerminal.getTerminalCode());
+					farmControlTerminal.getTerminalCode(),
+					farmControlTerminal.getTerminalNo());
 			List identifyingTerminalList = farmControlTerminalDao
 					.getDynamicList(identifyingTerminal);
 			if (identifyingTerminalList.size() > 0) {
 				return SystemResultEncapsulation.fillResultCode(
 						SystemReturnCodeEnum.UNIQUE_ERROR, null,
-						"exist same unit and identifying");
+						"exist same unit and terminal");
 			}
 		}
 		return super.baseSave(farmControlTerminal);

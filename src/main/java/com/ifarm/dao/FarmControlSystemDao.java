@@ -20,13 +20,13 @@ public class FarmControlSystemDao extends BaseDao<FarmControlSystem> {
 		sqlQuery.setParameter(0, farmId);
 		return sqlQuery.list();
 	}
-	
+
 	public Integer saveFarmControlSystem(FarmControlSystem farmControlSystem) {
 		Session session = getSession();
 		session.save(farmControlSystem);
 		return farmControlSystem.getSystemId();
 	}
-	
+
 	/**
 	 * 某个用户，某种类型的控制系统（不包括水肥药）
 	 * 
@@ -61,7 +61,7 @@ public class FarmControlSystemDao extends BaseDao<FarmControlSystem> {
 	 */
 	public List farmControlUnitToTerminal(Integer untiId) {
 		Session session = getSession();
-		String sql = "SELECT t.terminalId,t.controlDeviceId,t.unitId,t.controlDeviceBit,t.controlType,t.functionCode,t.terminalIdentifying,t.terminalCreateTime FROM FarmControlTerminal t where t.unitId = ?";
+		String sql = "SELECT t.terminalId,t.controlDeviceId,t.unitId,t.controlDeviceBit,t.controlType,t.functionCode,t.terminalCode,t.terminalCreateTime FROM FarmControlTerminal t where t.unitId = ?";
 		Query query = session.createQuery(sql);
 		query.setParameter(0, untiId);
 		return query.list();
@@ -70,18 +70,30 @@ public class FarmControlSystemDao extends BaseDao<FarmControlSystem> {
 	/**
 	 * 复合系统（如水肥药）是单独处理，业务逻辑完全不一样
 	 * 
-	 * @param systemId
+	 * @param unitId
 	 * @return
 	 */
-	public List farmMultiControlUnitToTerminal(Integer untiId, String terminalIdentifying) {
+	public List farmMultiControlUnitToTerminal(Integer unitId,
+			String terminalCode) {
 		Session session = getSession();
-		String sql = "SELECT t.controlDeviceId,t.controlDeviceBit,t.functionCode,t.terminalIdentifying FROM FarmControlTerminal t where t.unitId = ? and t.terminalIdentifying = ?";
+		String sql = "SELECT t.controlDeviceId,t.controlDeviceBit,t.terminalStatus,t.terminalCode FROM FarmControlTerminal t where t.unitId = ? and t.terminalCode = ?";
 		Query query = session.createQuery(sql);
-		query.setParameter(0, untiId);
-		query.setParameter(1, terminalIdentifying);
+		query.setParameter(0, unitId);
+		query.setParameter(1, terminalCode);
 		return query.list();
 	}
-	
+
+	public List farmMultiControlTerminalByUnit(Integer unitId,
+			String functionCode, Integer terminalNo) {
+		Session session = getSession();
+		String sql = "SELECT t.controlDeviceId,t.controlDeviceBit,t.terminalStatus,t.terminalCode FROM FarmControlTerminal t where t.unitId = ? and t.functionCode = ? and t.terminalNo = ?";
+		Query query = session.createQuery(sql);
+		query.setParameter(0, unitId);
+		query.setParameter(1, functionCode);
+		query.setParameter(2, terminalNo);
+		return query.list();
+	}
+
 	public List controlSystemRegion(String farmId) {
 		Session session = getSession();
 		String sql = "SELECT sys.systemDistrict,sys.systemLocation FROM (SELECT c.farmId,c.systemDistrict,c.systemLocation FROM farm_control_system c "
@@ -90,13 +102,13 @@ public class FarmControlSystemDao extends BaseDao<FarmControlSystem> {
 		sqlQuery.setParameter(0, farmId);
 		return sqlQuery.list();
 	}
-	
+
 	public List regionControlSystem(String farmId, String systemDistrict,
 			String systemLocation) {
 		Session session = getSession();
-		String sql = "SELECT sys.systemDistrict,sys.systemLocation,sys.systemId,sys.systemCode,sys.systemType,sys.systemTypeCode,sys.systemDescription,sys.systemNo FROM (SELECT c.farmId,c.systemDistrict,c.systemLocation,c.systemId," +
-				"c.systemCode,c.systemType,c.systemTypeCode,c.systemDescription,c.systemNo FROM farm_control_system c UNION ALL SELECT w.farmId,w.systemDistrict,w.systemLocation,w.systemId,w.systemCode,w.systemType,w.systemTypeCode,w.systemDescription,w.systemNo FROM farm_control_system_wfm w)" +
-				" as sys WHERE sys.farmId = ? AND sys.systemDistrict = ? AND sys.systemLocation = ? ORDER BY sys.systemDistrict";
+		String sql = "SELECT sys.systemDistrict,sys.systemLocation,sys.systemId,sys.systemCode,sys.systemType,sys.systemTypeCode,sys.systemDescription,sys.systemNo FROM (SELECT c.farmId,c.systemDistrict,c.systemLocation,c.systemId,"
+				+ "c.systemCode,c.systemType,c.systemTypeCode,c.systemDescription,c.systemNo FROM farm_control_system c UNION ALL SELECT w.farmId,w.systemDistrict,w.systemLocation,w.systemId,w.systemCode,w.systemType,w.systemTypeCode,w.systemDescription,w.systemNo FROM farm_control_system_wfm w)"
+				+ " as sys WHERE sys.farmId = ? AND sys.systemDistrict = ? AND sys.systemLocation = ? ORDER BY sys.systemDistrict";
 		SQLQuery sqlQuery = session.createSQLQuery(sql);
 		sqlQuery.setParameter(0, farmId);
 		sqlQuery.setParameter(1, systemDistrict);
@@ -112,7 +124,8 @@ public class FarmControlSystemDao extends BaseDao<FarmControlSystem> {
 	 * @param collectorId
 	 * @return
 	 */
-	public boolean farmControlSystemVerification(String userId, Integer farmId, Integer systemId) {
+	public boolean farmControlSystemVerification(String userId, Integer farmId,
+			Integer systemId) {
 		Session session = getSession();
 		String sqlString = "SELECT COUNT(*) FROM farm f INNER JOIN farm_control_system c ON f.farmId=c.farmId WHERE f.farmId=? AND "
 				+ "f.userId=? AND c.systemId=?";

@@ -19,7 +19,7 @@ public enum ControlSystemEnum {
 	WATER_FERTILIZER_MEDICINDE("waterFertilizerMedicine", "水肥药系统", "水肥药", "waterFertilizerMedicineControl"),
 	IRRIGATION("irrigation", "灌溉控制系统", "灌溉", "irrigationControl"),
 	FERTILIZE("fertilize", "施肥控制系统", "施肥", "fertilizeControl"),
-	PESTICIDE_APPLICATION("pesticideApplication", "施药控制系统", "施药", "pesticideApplicationControl"),
+	PESTICIDE("pesticide", "施药控制系统", "施药", "pesticideControl"),
 	;
 	private String code;
 	private String ChineseName;

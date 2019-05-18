@@ -33,23 +33,28 @@ public class FarmControlTerminal {
 	// 优先级，例如水肥药里面泵先启动，优先级可配置
 	@Validator
 	private String priority;
+	@Validator
 	private Integer terminalNo;
+	private String terminalStatus;
+	@Validator
+	private Boolean preBoot;
 	private String remark;
-	
+
 	public FarmControlTerminal() {
-		
+
 	}
-	
+
 	public FarmControlTerminal(Integer controlDeviceId, Integer controlDeviceBit) {
 		super();
 		this.controlDeviceId = controlDeviceId;
 		this.controlDeviceBit = controlDeviceBit;
 	}
 
-	public FarmControlTerminal(Integer unitId, String terminalCode) {
+	public FarmControlTerminal(Integer unitId, String terminalCode, Integer terminalNo) {
 		super();
 		this.unitId = unitId;
 		this.terminalCode = terminalCode;
+		this.terminalNo = terminalNo;
 	}
 
 	public Integer getTerminalId() {
@@ -67,7 +72,7 @@ public class FarmControlTerminal {
 	public void setControlDeviceId(Integer controlDeviceId) {
 		this.controlDeviceId = controlDeviceId;
 	}
-	
+
 	public Integer getUnitId() {
 		return unitId;
 	}
@@ -138,6 +143,22 @@ public class FarmControlTerminal {
 
 	public void setTerminalNo(Integer terminalNo) {
 		this.terminalNo = terminalNo;
+	}
+
+	public String getTerminalStatus() {
+		return terminalStatus;
+	}
+
+	public void setTerminalStatus(String terminalStatus) {
+		this.terminalStatus = terminalStatus;
+	}
+
+	public Boolean getPreBoot() {
+		return preBoot;
+	}
+
+	public void setPreBoot(Boolean preBoot) {
+		this.preBoot = preBoot;
 	}
 
 	public String getRemark() {

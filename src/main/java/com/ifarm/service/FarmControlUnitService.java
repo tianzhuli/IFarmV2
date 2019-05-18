@@ -9,12 +9,10 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ifarm.bean.FarmControlUnit;
-import com.ifarm.constant.SystemConfigCache;
 import com.ifarm.dao.FarmControlUnitDao;
 import com.ifarm.enums.ControlSystemEnum;
 import com.ifarm.enums.ServiceHeadEnum;
 import com.ifarm.enums.SystemReturnCodeEnum;
-import com.ifarm.util.CacheDataBase;
 import com.ifarm.util.JsonObjectUtil;
 import com.ifarm.util.SystemResultEncapsulation;
 
@@ -48,7 +46,7 @@ public class FarmControlUnitService extends
 					.fillResultCode(SystemReturnCodeEnum.UNIQUE_ERROR);
 		}
 
-		if (systemEnum.equals(ControlSystemEnum.WATER_FERTILIZER_MEDICINDE)) {
+		/*if (systemEnum.equals(ControlSystemEnum.WATER_FERTILIZER_MEDICINDE)) {
 			if (!validatorWfmExt(farmControlUnit.getUnitExtInfo())) {
 				return SystemResultEncapsulation.fillResultCode(
 						SystemReturnCodeEnum.PARAM_ERROR,
@@ -70,7 +68,7 @@ public class FarmControlUnitService extends
 					}
 				}
 			}
-		}
+		}*/
 		return super.baseSave(farmControlUnit);
 	}
 

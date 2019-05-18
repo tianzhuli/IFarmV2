@@ -63,18 +63,5 @@
 		"vavleControl": "阀门控制系统",
 		"waterFertilizerMedicineControl": "水肥药控制系统"
 	},
-	"controlUnitExt": {
-	    "carbonDioxideControl": ["nodeNum"],
-		"draughtFanControl": ["nodeNum"],
-		"fillLightControl": ["nodeNum"],
-		"sideRollerShutterControl": ["nodeNum"],
-		"sunshadeControl": ["nodeNum"],
-		"topRollerShutterControl": ["nodeNum"],
-		"valveControl": ["nodeNum"],
-		"waterRollerShutterControl": ["medicineNum", "pumpNum", "fertierNum"],
-		"temperatureControl": ["riseNum","fallNum"],
-		"humidityControl" : ["nodeNum"],
-		"oxygenControl" : ["nodeNum"]
-	},
 	"swithMultiControlTask": ["waterRollerShutterControl", "temperatureControl", "humidityControl"]
 }

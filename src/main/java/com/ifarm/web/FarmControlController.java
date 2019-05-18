@@ -18,7 +18,6 @@ import com.ifarm.bean.FarmControlSystem;
 import com.ifarm.bean.FarmControlTerminal;
 import com.ifarm.bean.MultiControlTask;
 import com.ifarm.constant.ControlTaskEnum;
-import com.ifarm.constant.SystemConfigCache;
 import com.ifarm.enums.ControlSystemEnum;
 import com.ifarm.enums.SystemReturnCodeEnum;
 import com.ifarm.nosql.service.CombinationControlTaskService;
@@ -27,6 +26,7 @@ import com.ifarm.redis.util.UserRedisUtil;
 import com.ifarm.redis.util.WfmControlTaskRedisHelper;
 import com.ifarm.service.FarmControlSystemService;
 import com.ifarm.service.FarmControlTerminalService;
+import com.ifarm.util.BaseIfarmUtil;
 import com.ifarm.util.CacheDataBase;
 import com.ifarm.util.ControlHandlerUtil;
 import com.ifarm.util.ControlTaskUtil;
@@ -138,8 +138,7 @@ public class FarmControlController {
 			try {
 				String controlType = controlTask.getControlType();
 				EventContext eventContext = new EventContext();
-				if ((boolean) CacheDataBase.systemConfigCacheMap
-						.get(SystemConfigCache.MULTIPLE_CONTROL_SYSTEM)) {
+				if (BaseIfarmUtil.isSwithMultiControl()) {
 					JSONArray multiArray = CacheDataBase.initBaseConfig.get(
 							"controlSystemType.json").getJSONArray(
 							"swithMultiControlTask");

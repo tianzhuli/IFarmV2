@@ -53,7 +53,8 @@ public class FarmControlSystemController {
 				.getJSONObject(controlType);
 		return jsonObject.toJSONString();
 	}
-
+	
+	@Deprecated
 	@RequestMapping("wfm/terminalType")
 	public String wfmFarmControlSystemTerminalType(
 			FarmControlUnit farmControlUnit) {

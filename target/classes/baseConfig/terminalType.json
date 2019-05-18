@@ -112,57 +112,5 @@
 			"terminalIdentifying":"",
 			"terminalName":""
 		}]
-	},
-	"ControlOperation" : {
-	    "carbonDioxideControl": [{
-			"functionName": "开",
-			"functionCode": "enable"
-		}],
-		"draughtFanControl": [{
-			"functionName": "开",
-			"functionCode": "enable"
-		}],
-		"fillLightControl": [{
-			"functionName": "开",
-			"functionCode": "enable"
-		}],
-		"sideRollerShutterControl": [{
-			"functionName": "开",
-			"functionCode": "enable"
-		}],
-		"sunshadeControl": [{
-			"functionName": "开",
-			"functionCode": "enable"
-		}],
-		"topRollerShutterControl": [{
-			"functionName": "开",
-			"functionCode": "enable"
-		}],
-		"valveControl": [{
-			"functionName": "开",
-			"functionCode": "enable"
-		}],
-		"waterRollerShutterControl": [{
-			"functionName": "灌溉",
-			"functionCode": "irrigate"
-		},{
-			"functionName": "施肥",
-			"functionCode": "fertilizer"
-		},{
-			"functionName": "施药",
-			"functionCode": "medicine"
-		}],
-		"temperatureControl": [{
-			"functionName": "开",
-			"functionCode": "enable"
-		}],
-		"humidityControl" : [{
-			"functionName": "开",
-			"functionCode": "enable"
-		}],
-		"oxygenControl" : [{
-			"functionName": "开",
-			"functionCode": "enable"
-		}]
 	}
 }

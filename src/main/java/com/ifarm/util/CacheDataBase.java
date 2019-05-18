@@ -363,7 +363,7 @@ public class CacheDataBase {
 				} else if (StringUtil.equals("Boolean", configType)) {
 					farmConfigCacheMap.put(configKey,
 							Boolean.valueOf(configValue));
-				} else if (StringUtil.equals("JSONObject", configType)) {
+				} else if (StringUtil.equals("JSON", configType)) {
 					farmConfigCacheMap.put(configKey,
 							JSONObject.parse(configValue));
 				} else {

@@ -1,4 +1,4 @@
- package com.ifarm.service;
+package com.ifarm.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +21,7 @@ import com.ifarm.bean.FarmControlSystem;
 import com.ifarm.bean.FarmControlUnit;
 import com.ifarm.bean.MultiControlCommand;
 import com.ifarm.bean.MultiControlTask;
+import com.ifarm.constant.IfarmConfigConstant;
 import com.ifarm.constant.SystemConfigCache;
 import com.ifarm.constant.SystemResultCodeEnum;
 import com.ifarm.dao.ControlSystemDao;
@@ -31,9 +32,11 @@ import com.ifarm.dao.FarmControlUnitDao;
 import com.ifarm.enums.ControlSystemEnum;
 import com.ifarm.enums.ServiceHeadEnum;
 import com.ifarm.enums.SystemControlStatusEnum;
+import com.ifarm.util.BaseIfarmUtil;
 import com.ifarm.util.CacheDataBase;
 import com.ifarm.util.ControlStrategyUtil;
 import com.ifarm.util.JsonObjectUtil;
+import com.ifarm.util.StringUtil;
 import com.ifarm.util.SystemResultEncapsulation;
 
 @Service
@@ -50,7 +53,7 @@ public class FarmControlSystemService {
 
 	@Autowired
 	private FarmControlUnitDao farmControlUnitDao;
-	
+
 	@Autowired
 	private FarmControlTerminalDao farmControlTerminalDao;
 
@@ -206,14 +209,45 @@ public class FarmControlSystemService {
 		if ((boolean) CacheDataBase.systemConfigCacheMap
 				.get(SystemConfigCache.MULTIPLE_CONTROL_SYSTEM)) {
 			String unitNodeInfo = controlTask.getUnitNodeInfo();
-			JSONObject unitNodeJson =JSONObject.parseObject(unitNodeInfo);
-			for (String terminalIdentifying : unitNodeJson.keySet()) {
-				Integer nodeNum = unitNodeJson.getInteger(terminalIdentifying);
-				List<Object[]> terminalList = farmControlSystemDao
-						.farmMultiControlUnitToTerminal(unitId, terminalIdentifying
-								+ nodeNum);
-				controlTerminalToControlDevice(map, terminalList,
-						controlDevicesArrayList);
+			JSONObject unitNodeJson = JSONObject.parseObject(unitNodeInfo);
+			ControlSystemEnum controlSystemEnum = ControlSystemEnum
+					.getValueByType(controlType);
+			if (BaseIfarmUtil.isPreBoot(controlType)) {
+				JSONArray preBootArray = ((JSONObject) CacheDataBase.farmConfigCacheMap
+						.get(IfarmConfigConstant.CONTROL_PRE_BOOT))
+						.getJSONArray(controlSystemEnum.getCode());
+				if (preBootArray != null) {
+					for (int i = 0; i < preBootArray.size(); i++) {
+						String preBootCode = preBootArray.getString(i);
+						List<Object[]> terminalList = null;
+						if (StringUtil.equals(preBootCode, "pumpEnable")) {
+							terminalList = farmControlSystemDao
+									.farmMultiControlTerminalByUnit(unitId,
+											preBootCode, 1);
+						} else if (StringUtil.equals(preBootCode, "canEnable")) {
+							terminalList = farmControlSystemDao
+									.farmMultiControlTerminalByUnit(unitId,
+											preBootCode, Integer
+													.valueOf(controlTask
+															.getCanNo()));
+						} else {
+							continue;
+						}
+						controlTerminalToControlDevice(map, terminalList,
+								controlDevicesArrayList);
+					}
+				}
+			}
+			for (String functionCode : unitNodeJson.keySet()) {
+				String[] terminalNoArr = unitNodeJson.getString(functionCode)
+						.split(",");
+				for (String terminalNo : terminalNoArr) {
+					List<Object[]> terminalList = farmControlSystemDao
+							.farmMultiControlTerminalByUnit(unitId,
+									functionCode, Integer.valueOf(terminalNo));
+					controlTerminalToControlDevice(map, terminalList,
+							controlDevicesArrayList);
+				}
 			}
 			sortAndBuildCommand(controlDevicesArrayList, map, controlTask);
 			return;
@@ -390,43 +424,13 @@ public class FarmControlSystemService {
 	}
 
 	public String farmControlSystemTerimal(FarmControlUnit farmControlUnit) {
-		JSONArray jsonArray = new JSONArray();
 		FarmControlUnit controlUnit = farmControlUnitDao.getTById(
 				farmControlUnit.getUnitId(), FarmControlUnit.class);
 		String controlType = controlUnit.getSystemType();
-		JSONObject extJsonObject = JSONObject.parseObject(controlUnit
-				.getUnitExtInfo());
 		JSONArray terminalIdentifyingArray = CacheDataBase.initBaseConfig
 				.get("terminalType.json").getJSONObject("terminalIdentifying")
 				.getJSONArray(controlType);
-		JSONArray nodeKeys = CacheDataBase.initBaseConfig
-				.get("controlSystemType.json").getJSONObject("controlUnitExt")
-				.getJSONArray(controlType);
-		for (int i = 0; i < nodeKeys.size(); i++) {
-			Integer nodeNum = extJsonObject.getInteger(nodeKeys.getString(i));
-			for (int j = 1; j <= nodeNum; j++) {
-				for (int k = 0; k < terminalIdentifyingArray.size(); k++) {
-					JSONObject jsonObject = new JSONObject();
-					JSONObject identifyingJsonObject = terminalIdentifyingArray
-							.getJSONObject(k);
-					jsonObject.put("controlType", controlType);
-					jsonObject.put(
-							"terminalIdentifying",
-							identifyingJsonObject
-									.getString("terminalIdentifying") + j);
-					jsonObject.put("functionName",
-							identifyingJsonObject.getString("functionName"));
-					jsonObject.put("functionCode",
-							identifyingJsonObject.getString("functionCode"));
-					jsonObject
-							.put("terminalName",
-									identifyingJsonObject
-											.getString("terminalName") + j);
-					jsonArray.add(jsonObject);
-				}
-			}
-		}
-		return jsonArray.toString();
+		return terminalIdentifyingArray.toString();
 	}
 
 }

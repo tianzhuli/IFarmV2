@@ -16,7 +16,6 @@ import com.ifarm.bean.ControlTask;
 import com.ifarm.bean.MultiControlCommand;
 import com.ifarm.bean.MultiControlTask;
 import com.ifarm.constant.ControlTaskEnum;
-import com.ifarm.constant.SystemConfigCache;
 import com.ifarm.enums.ControlSystemEnum;
 import com.ifarm.service.FarmControlSystemService;
 
@@ -100,8 +99,7 @@ public class ControlHandlerUtil {
 		try {
 			controlHandlerUtil_log.info("撤销的任务：" + controlId);
 			boolean isMulti = false;
-			if ((boolean) CacheDataBase.systemConfigCacheMap
-					.get(SystemConfigCache.MULTIPLE_CONTROL_SYSTEM)) {
+			if (BaseIfarmUtil.isSwithMultiControl()) {
 				JSONArray multiArray = CacheDataBase.initBaseConfig.get(
 						"controlSystemType.json").getJSONArray(
 						"swithMultiControlTask");
