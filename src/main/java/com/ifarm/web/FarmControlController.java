@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,6 +55,9 @@ public class FarmControlController {
 
 	@Autowired
 	private UserRedisUtil userRedisUtil;
+	
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(FarmControlController.class);
 
 	@RequestMapping("controlSystemList")
 	@CrossOrigin
@@ -174,6 +179,7 @@ public class FarmControlController {
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
+				LOGGER.error("execute error:", e);
 				return SystemResultEncapsulation.fillErrorCode(e);
 			}
 			return SystemResultEncapsulation

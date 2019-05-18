@@ -47,6 +47,18 @@
 	    "systemCode": "pump",
 		"systemType": "水泵控制系统",
 		"systemTypeCode": "pumpControl"
+	}, {
+	    "systemCode": "irrigation",
+		"systemType": "灌溉控制系统",
+		"systemTypeCode": "irrigationControl"
+	}, {
+	    "systemCode": "fertilize",
+		"systemType": "施肥控制系统",
+		"systemTypeCode": "fertilizeControl"
+	}, {
+	    "systemCode": "pesticide",
+		"systemType": "施药控制系统",
+		"systemTypeCode": "pesticideControl"
 	}],
 	"systemName": {
 		"pumpControl": "水泵控制系统",
@@ -61,7 +73,10 @@
 		"sideRollerShuttersControl": "侧卷帘系统",
 		"carbonDioxideControl": "二氧化碳控制系统",
 		"vavleControl": "阀门控制系统",
-		"waterFertilizerMedicineControl": "水肥药控制系统"
+		"waterFertilizerMedicineControl": "水肥药控制系统",
+		"irrigationControl": "灌溉控制系统",
+		"fertilizeControl": "施肥控制系统",
+		"pesticideControl": "施药控制系统"
 	},
-	"swithMultiControlTask": ["waterRollerShutterControl", "temperatureControl", "humidityControl"]
+	"swithMultiControlTask": ["waterRollerShutterControl", "temperatureControl", "humidityControl", "irrigationControl", "fertilizeControl", "pesticideControl"]
 }

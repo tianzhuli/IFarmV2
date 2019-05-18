@@ -1,5 +1,6 @@
 package com.ifarm.util;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ifarm.constant.IfarmConfigConstant;
 import com.ifarm.constant.SystemConfigCache;
@@ -19,12 +20,18 @@ public class BaseIfarmUtil {
 		return StringUtil.equals(controlStrategy,
 				ControlStrategyEnum.PRE_BOOT_STRATEGY.getCode());
 	}
-	
+
 	public static boolean isEnableMultiFunction(String controlType) {
 		String controlStrategy = ((JSONObject) CacheDataBase.farmConfigCacheMap
 				.get(IfarmConfigConstant.CONTROL_SYSTEM_STRATEGY))
 				.getString(controlType);
 		return StringUtil.equals(controlStrategy,
 				ControlStrategyEnum.MULTI_FUNCTION_STRATEGY.getCode());
+	}
+
+	public static boolean isPreBootFunctionCode(String functionCode) {
+		JSONArray functionArray = ((JSONArray) CacheDataBase.farmConfigCacheMap
+				.get(IfarmConfigConstant.PRE_BOOT_FUNCTION_CODE));
+		return functionArray != null && functionArray.contains(functionCode);
 	}
 }

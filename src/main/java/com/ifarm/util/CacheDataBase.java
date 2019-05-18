@@ -340,9 +340,8 @@ public class CacheDataBase {
 		}
 
 	}
-	
-	public static void loadFarmConfigCache(Connection con)
-			throws SQLException {
+
+	public static void loadFarmConfigCache(Connection con) throws SQLException {
 		farmConfigCacheMap.clear();
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
@@ -366,8 +365,14 @@ public class CacheDataBase {
 				} else if (StringUtil.equals("JSON", configType)) {
 					farmConfigCacheMap.put(configKey,
 							JSONObject.parse(configValue));
+				} else if (StringUtil.equals("JSONArray", configType)) {
+					farmConfigCacheMap.put(configKey,
+							JSONArray.parse(configValue));
 				} else {
-					farmConfigCacheMap.put(configKey, JSONObject.parseObject(configValue,Class.forName(configType)));
+					farmConfigCacheMap.put(
+							configKey,
+							JSONObject.parseObject(configValue,
+									Class.forName(configType)));
 				}
 			}
 		} catch (Exception e) {
@@ -431,7 +436,6 @@ public class CacheDataBase {
 			}
 		}
 	}
-	
 
 	public static void initialize() throws Exception {
 		ConDb conDb = new ConDb();

@@ -5,13 +5,11 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSONObject;
 import com.ifarm.bean.ControlSystem;
 import com.ifarm.bean.FarmControlSystem;
 import com.ifarm.bean.FarmControlTerminal;
 import com.ifarm.bean.FarmControlUnit;
 import com.ifarm.bean.FarmWFMControlSystem;
-import com.ifarm.constant.SystemConfigCache;
 import com.ifarm.enums.ControlSystemEnum;
 import com.ifarm.redis.util.FarmControlSystemTypeUtil;
 import com.ifarm.service.FarmControlSystemService;
@@ -43,17 +41,10 @@ public class FarmControlSystemController {
 	@RequestMapping("terminalType")
 	public String farmControlSystemTerminalType(String controlType,
 			FarmControlUnit farmControlUnit) {
-		if ((boolean) CacheDataBase.systemConfigCacheMap
-				.get(SystemConfigCache.CONTROL_SYSTEM_TYPE_DRM)) {
-			return farmControlSystemService
-					.farmControlSystemTerimal(farmControlUnit);
-		}
-		JSONObject jsonObject = CacheDataBase.initBaseConfig
-				.get("terminalType.json").getJSONObject("terminalType")
-				.getJSONObject(controlType);
-		return jsonObject.toJSONString();
+		return farmControlSystemService
+				.farmControlSystemTerimal(farmControlUnit);
 	}
-	
+
 	@Deprecated
 	@RequestMapping("wfm/terminalType")
 	public String wfmFarmControlSystemTerminalType(

@@ -179,6 +179,7 @@ public class ControlTaskUtil {
 		MultiControlTask wTask = fromJson(JsonObjectUtil
 				.fromOriginalBean(controlTask));
 		wTask.setCanNo(httpRequest.getParameter("canNo"));
+		wTask.setUnitNodeInfo(httpRequest.getParameter("unitNodeInfo"));
 		return wTask;
 	}
 

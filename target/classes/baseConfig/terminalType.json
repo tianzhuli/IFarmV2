@@ -1,116 +1,87 @@
 {
-	"terminalType": {
-		"carbonDioxideControl": {
-			"functionName": "开",
-			"functionCode": "enable"
-		},
-		"draughtFanControl": {
-			"functionName": "开",
-			"functionCode": "enable"
-		},
-		"fillLightControl": {
-			"functionName": "开",
-			"functionCode": "enable"
-		},
-		"sideRollerShutterControl": {
-			"functionName": "开",
-			"functionCode": "enable"
-		},
-		"sunshadeControl": {
-			"functionName": "开",
-			"functionCode": "enable"
-		},
-		"topRollerShutterControl": {
-			"functionName": "开",
-			"functionCode": "enable"
-		},
-		"valveControl": {
-			"functionName": "开",
-			"functionCode": "enable"
-		},
-		"waterRollerShutterControl": {
-			"functionName": "开",
-			"functionCode": "enable"
-		},
-		"temperatureControl": {
-		    "functionName": "开",
-			"functionCode": "enable"
-		},
-		"humidityControl" : {
-		    "functionName": "开",
-			"functionCode": "enable"
-		},
-		"oxygenControl" : {
-		    "functionName": "开",
-			"functionCode": "enable"
-		}
-	},
 	"terminalIdentifying": {
-	    "carbonDioxideControl": [{
-			"functionName": "开",
-			"functionCode": "enable",
-			"terminalIdentifying":"",
-			"terminalName":""
+		"carbonDioxideControl": [{
+			"functionName": "增加",
+			"functionCode": "rise"
+		}, {
+			"functionName": "减少",
+			"functionCode": "decrease"
 		}],
 		"draughtFanControl": [{
 			"functionName": "开",
-			"functionCode": "enable",
-			"terminalIdentifying":"",
-			"terminalName":""
+			"functionCode": "enable"
 		}],
 		"fillLightControl": [{
-			"functionName": "开",
-			"functionCode": "enable",
-			"terminalIdentifying":"",
-			"terminalName":""
+			"functionName": "红外线",
+			"functionCode": "infrare"
+		}, {
+			"functionName": "紫外线",
+			"functionCode": "ultraviolet"
 		}],
 		"sideRollerShutterControl": [{
 			"functionName": "开",
-			"functionCode": "enable",
-			"terminalIdentifying":"",
-			"terminalName":""
+			"functionCode": "enable"
 		}],
 		"sunshadeControl": [{
 			"functionName": "开",
-			"functionCode": "enable",
-			"terminalIdentifying":"",
-			"terminalName":""
+			"functionCode": "enable"
 		}],
 		"topRollerShutterControl": [{
 			"functionName": "开",
-			"functionCode": "enable",
-			"terminalIdentifying":"",
-			"terminalName":""
+			"functionCode": "enable"
 		}],
 		"valveControl": [{
 			"functionName": "开",
-			"functionCode": "enable",
-			"terminalIdentifying":"",
-			"terminalName":""
+			"functionCode": "enable"
 		}],
 		"waterRollerShutterControl": [{
 			"functionName": "开",
-			"functionCode": "enable ",
-			"terminalIdentifying":" ",
-			"terminalName":""
+			"functionCode": "enable "
 		}],
 		"temperatureControl": [{
-			"functionName": "开",
-			"functionCode": "enable",
-			"terminalIdentifying":"",
-			"terminalName":""
+			"functionName": "升温",
+			"functionCode": "rise"
+		}, {
+			"functionName": "降温",
+			"functionCode": "decrease"
 		}],
-		"humidityControl" : [{
+		"humidityControl": [{
 			"functionName": "开",
-			"functionCode": "enable",
-			"terminalIdentifying":"humidity",
-			"terminalName":"湿度"
+			"functionCode": "enable"
 		}],
-		"oxygenControl" : [{
+		"oxygenControl": [{
 			"functionName": "开",
-			"functionCode": "enable",
-			"terminalIdentifying":"",
-			"terminalName":""
+			"functionCode": "enable"
+		}],
+		"irrigationControl": [{
+			"functionName": "启动泵",
+			"functionCode": "pumpEnable"
+		}, {
+			"functionName": "滴灌",
+			"functionCode": "dripIrrigation"
+		}, {
+			"functionName": "喷灌",
+			"functionCode": "sprinkIrrigation"
+		}],
+		"fertilizeControl": [{
+			"functionName": "启动泵",
+			"functionCode": "pumpEnable"
+		}, {
+			"functionName": "启动罐",
+			"functionCode": "canEnable"
+		}, {
+			"functionName": "施肥",
+			"functionCode": "fertilizer"
+		}],
+		"pesticideControl": [{
+			"functionName": "启动泵",
+			"functionCode": "pumpEnable"
+		}, {
+			"functionName": "启动罐",
+			"functionCode": "canEnable"
+		}, {
+			"functionName": "施药",
+			"functionCode": "pesticider"
 		}]
 	}
 }

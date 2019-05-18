@@ -76,7 +76,7 @@ public class UserControlData extends WebSocketSubjectDecorate {
 			WebSocketSession session = map.get(key);
 			observer.update(key, session, message);
 		} else {
-			LOGGER.info("用户" + key + "不在线");
+			LOGGER.info("用户={} 不在线，message={}", key ,message);
 			// 添加到缓存
 			/*if (!CacheDataBase.userControlResultMessageCache.containsKey(key)) {
 				CacheDataBase.userControlResultMessageCache.put(key, new LinkedBlockingQueue<String>());

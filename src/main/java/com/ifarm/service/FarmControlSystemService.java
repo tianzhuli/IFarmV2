@@ -208,11 +208,10 @@ public class FarmControlSystemService {
 		ArrayList<Integer> controlDevicesArrayList = new ArrayList<>();
 		if ((boolean) CacheDataBase.systemConfigCacheMap
 				.get(SystemConfigCache.MULTIPLE_CONTROL_SYSTEM)) {
-			String unitNodeInfo = controlTask.getUnitNodeInfo();
-			JSONObject unitNodeJson = JSONObject.parseObject(unitNodeInfo);
+			JSONObject unitNodeJson = JSONObject.parseObject(controlTask.getUnitNodeInfo());
 			ControlSystemEnum controlSystemEnum = ControlSystemEnum
-					.getValueByType(controlType);
-			if (BaseIfarmUtil.isPreBoot(controlType)) {
+					.getValueByType(controlTask.getControlType());
+			if (BaseIfarmUtil.isPreBoot(controlSystemEnum.getType())) {
 				JSONArray preBootArray = ((JSONObject) CacheDataBase.farmConfigCacheMap
 						.get(IfarmConfigConstant.CONTROL_PRE_BOOT))
 						.getJSONArray(controlSystemEnum.getCode());
@@ -224,17 +223,22 @@ public class FarmControlSystemService {
 							terminalList = farmControlSystemDao
 									.farmMultiControlTerminalByUnit(unitId,
 											preBootCode, 1);
+							controlTerminalToControlDevice(map, terminalList,
+									controlDevicesArrayList);
 						} else if (StringUtil.equals(preBootCode, "canEnable")) {
-							terminalList = farmControlSystemDao
-									.farmMultiControlTerminalByUnit(unitId,
-											preBootCode, Integer
-													.valueOf(controlTask
-															.getCanNo()));
-						} else {
-							continue;
+							if (controlTask.getCanNo().isEmpty()) {
+								continue;
+							}
+							String[] canNos = controlTask.getCanNo().split(",");
+							for (String canNo : canNos) {
+								terminalList = farmControlSystemDao
+										.farmMultiControlTerminalByUnit(unitId,
+												preBootCode,
+												Integer.valueOf(canNo));
+								controlTerminalToControlDevice(map,
+										terminalList, controlDevicesArrayList);
+							}
 						}
-						controlTerminalToControlDevice(map, terminalList,
-								controlDevicesArrayList);
 					}
 				}
 			}

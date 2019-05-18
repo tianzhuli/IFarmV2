@@ -55,7 +55,7 @@ public class FarmControlTerminalService extends
 		for (FarmControlTerminal terminal : farmControlTerminals) {
 			if (StringUtil.equals(farmControlUnit.getSystemCode(),
 					terminal.getControlType())
-					&& terminal.getPreBoot()) {
+					&& !terminal.getPreBoot()) {
 				if (!functionCodeJsonObject.containsKey(terminal
 						.getFunctionCode())) {
 					functionCodeJsonObject.put(terminal.getFunctionCode(),
@@ -99,6 +99,12 @@ public class FarmControlTerminalService extends
 			return SystemResultEncapsulation.fillResultCode(
 					SystemReturnCodeEnum.PARAM_ERROR, "unit no exist");
 		}
+		if (BaseIfarmUtil.isPreBootFunctionCode(farmControlTerminal
+				.getFunctionCode())) {
+			farmControlTerminal.setPreBoot(true);
+		} else {
+			farmControlTerminal.setPreBoot(false);
+		}
 		super.validator(farmControlTerminal);
 		FarmControlTerminal contorlDeviceTerminal = new FarmControlTerminal(
 				farmControlTerminal.getControlDeviceId(),
@@ -108,7 +114,7 @@ public class FarmControlTerminalService extends
 		if (controlTermList.size() > 0) {
 			return SystemResultEncapsulation.fillResultCode(
 					SystemReturnCodeEnum.UNIQUE_ERROR, null,
-					"exist same controlId and bit");
+					"exist same deviceId and bit");
 		}
 		if (BaseIfarmUtil.isPreBoot(farmControlUnit.getSystemType())) {
 			FarmControlTerminal identifyingTerminal = new FarmControlTerminal(
