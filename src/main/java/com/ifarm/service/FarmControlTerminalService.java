@@ -82,7 +82,7 @@ public class FarmControlTerminalService extends
 						.getControlType()))) {
 			FarmControlTerminal identifyingTerminal = new FarmControlTerminal(
 					farmControlTerminal.getUnitId(),
-					farmControlTerminal.getTerminalIdentifying());
+					farmControlTerminal.getTerminalCode());
 			List identifyingTerminalList = farmControlTerminalDao
 					.getDynamicList(identifyingTerminal);
 			if (identifyingTerminalList.size() > 0) {

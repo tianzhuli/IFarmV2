@@ -1,7 +1,6 @@
 package com.ifarm.observer;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -84,8 +83,7 @@ public class IoControlData extends IoSessionSubjectDecorator {
 			} else {
 				LOGGER.info("底层集中器" + key + "已离线");
 			}
-		}
-		if (map.containsKey(key)) {
+		} else if (map.containsKey(key)) {
 			IoControlHandler observer = (IoControlHandler) constant
 					.get(Constants.ioControlHandler);
 			IoSession session = map.get(key);

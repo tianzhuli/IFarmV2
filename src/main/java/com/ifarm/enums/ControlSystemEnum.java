@@ -15,8 +15,12 @@ public enum ControlSystemEnum {
 	OXYGEN("oxygen", "氧气控制系统", "氧气", "oxygenControl"),
 	SUNSHADE("sunshade", "遮阳控制系统", "遮阳", "sunshadeControl"),
 	VALVE("valve", "阀门控制系统", "阀门", "valveControl"),
-	WATER_FERTILIZER_MEDICINDE("waterFertilizerMedicine", "水肥药系统", "水肥药", "waterFertilizerMedicineControl");
-	
+	// 水肥药要进行拆分，为了前期兼容，先不删除
+	WATER_FERTILIZER_MEDICINDE("waterFertilizerMedicine", "水肥药系统", "水肥药", "waterFertilizerMedicineControl"),
+	IRRIGATION("irrigation", "灌溉控制系统", "灌溉", "irrigationControl"),
+	FERTILIZE("fertilize", "施肥控制系统", "施肥", "fertilizeControl"),
+	PESTICIDE_APPLICATION("pesticideApplication", "施药控制系统", "施药", "pesticideApplicationControl"),
+	;
 	private String code;
 	private String ChineseName;
 	private String shortName;

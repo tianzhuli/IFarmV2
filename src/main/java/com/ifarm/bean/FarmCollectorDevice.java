@@ -13,6 +13,7 @@ public class FarmCollectorDevice {
 	private Long deviceId;
 	private Integer farmId;
 	private Long collectorId;
+	private Integer unitNo;
 	private Integer deviceOrderNo;
 	private String deviceVersion;
 	private String deviceType;
@@ -36,6 +37,12 @@ public class FarmCollectorDevice {
 	}
 	public void setCollectorId(Long collectorId) {
 		this.collectorId = collectorId;
+	}
+	public Integer getUnitNo() {
+		return unitNo;
+	}
+	public void setUnitNo(Integer unitNo) {
+		this.unitNo = unitNo;
 	}
 	public Integer getDeviceOrderNo() {
 		return deviceOrderNo;

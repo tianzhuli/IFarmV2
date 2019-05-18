@@ -28,11 +28,13 @@ public class FarmControlTerminal {
 	private String functionName;
 	@Validator
 	private String functionCode;
-	private String terminalIdentifying; // 端口标识
+	private String terminalCode; // 端口标识
 	private Timestamp terminalCreateTime;
 	// 优先级，例如水肥药里面泵先启动，优先级可配置
 	@Validator
 	private String priority;
+	private Integer terminalNo;
+	private String remark;
 	
 	public FarmControlTerminal() {
 		
@@ -44,10 +46,10 @@ public class FarmControlTerminal {
 		this.controlDeviceBit = controlDeviceBit;
 	}
 
-	public FarmControlTerminal(Integer unitId, String terminalIdentifying) {
+	public FarmControlTerminal(Integer unitId, String terminalCode) {
 		super();
 		this.unitId = unitId;
-		this.terminalIdentifying = terminalIdentifying;
+		this.terminalCode = terminalCode;
 	}
 
 	public Integer getTerminalId() {
@@ -106,14 +108,6 @@ public class FarmControlTerminal {
 		this.functionCode = functionCode;
 	}
 
-	public String getTerminalIdentifying() {
-		return terminalIdentifying;
-	}
-
-	public void setTerminalIdentifying(String terminalIdentifying) {
-		this.terminalIdentifying = terminalIdentifying;
-	}
-
 	public Timestamp getTerminalCreateTime() {
 		return terminalCreateTime;
 	}
@@ -128,6 +122,30 @@ public class FarmControlTerminal {
 
 	public void setPriority(String priority) {
 		this.priority = priority;
+	}
+
+	public String getTerminalCode() {
+		return terminalCode;
+	}
+
+	public void setTerminalCode(String terminalCode) {
+		this.terminalCode = terminalCode;
+	}
+
+	public Integer getTerminalNo() {
+		return terminalNo;
+	}
+
+	public void setTerminalNo(Integer terminalNo) {
+		this.terminalNo = terminalNo;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
 	}
 
 }

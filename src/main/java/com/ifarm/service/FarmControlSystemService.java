@@ -26,11 +26,11 @@ import com.ifarm.constant.SystemResultCodeEnum;
 import com.ifarm.dao.ControlSystemDao;
 import com.ifarm.dao.FarmControlDeviceDao;
 import com.ifarm.dao.FarmControlSystemDao;
+import com.ifarm.dao.FarmControlTerminalDao;
 import com.ifarm.dao.FarmControlUnitDao;
 import com.ifarm.enums.ControlSystemEnum;
 import com.ifarm.enums.ServiceHeadEnum;
 import com.ifarm.enums.SystemControlStatusEnum;
-import com.ifarm.exception.ValidatorException;
 import com.ifarm.util.CacheDataBase;
 import com.ifarm.util.ControlStrategyUtil;
 import com.ifarm.util.JsonObjectUtil;
@@ -50,6 +50,9 @@ public class FarmControlSystemService {
 
 	@Autowired
 	private FarmControlUnitDao farmControlUnitDao;
+	
+	@Autowired
+	private FarmControlTerminalDao farmControlTerminalDao;
 
 	private static final Logger farmControlSystemService_log = LoggerFactory
 			.getLogger(FarmControlSystemService.class);
@@ -202,19 +205,16 @@ public class FarmControlSystemService {
 		ArrayList<Integer> controlDevicesArrayList = new ArrayList<>();
 		if ((boolean) CacheDataBase.systemConfigCacheMap
 				.get(SystemConfigCache.MULTIPLE_CONTROL_SYSTEM)) {
-			String unitNode = controlTask.getUnitNode();
-			JSONArray array = CacheDataBase.initBaseConfig
-					.get("controlSystemType.json")
-					.getJSONObject("controlUnitTerminalIdentifying")
-					.getJSONArray(controlType);
-			if (array.size() != 1) {
-				throw new ValidatorException("error control node detail");
+			String unitNodeInfo = controlTask.getUnitNodeInfo();
+			JSONObject unitNodeJson =JSONObject.parseObject(unitNodeInfo);
+			for (String terminalIdentifying : unitNodeJson.keySet()) {
+				Integer nodeNum = unitNodeJson.getInteger(terminalIdentifying);
+				List<Object[]> terminalList = farmControlSystemDao
+						.farmMultiControlUnitToTerminal(unitId, terminalIdentifying
+								+ nodeNum);
+				controlTerminalToControlDevice(map, terminalList,
+						controlDevicesArrayList);
 			}
-			List<Object[]> terminalList = farmControlSystemDao
-					.farmMultiControlUnitToTerminal(unitId, array.getString(0)
-							+ unitNode);
-			controlTerminalToControlDevice(map, terminalList,
-					controlDevicesArrayList);
 			sortAndBuildCommand(controlDevicesArrayList, map, controlTask);
 			return;
 		}

@@ -29,14 +29,14 @@ public class FarmControlTerminalTest {
 			farmControlTerminal.setControlDeviceBit(0);
 			farmControlTerminal.setFunctionName("正转");
 			farmControlTerminal.setFunctionCode("forward");
-			farmControlTerminal.setTerminalIdentifying("pump");
+			farmControlTerminal.setTerminalCode("pump");
 			insertControlTerminal(connection, farmControlTerminal);
 			FarmControlTerminal farmControlTerminal1 = new FarmControlTerminal();
 			farmControlTerminal1.setControlDeviceId(deviceId);
 			farmControlTerminal1.setControlDeviceBit(1);
 			farmControlTerminal1.setFunctionName("反转");
 			farmControlTerminal1.setFunctionCode("reverse");
-			farmControlTerminal1.setTerminalIdentifying("pump");
+			farmControlTerminal1.setTerminalCode("pump");
 			insertControlTerminal(connection, farmControlTerminal1);
 			deviceId++;
 		}
@@ -50,14 +50,14 @@ public class FarmControlTerminalTest {
 			farmControlTerminal.setControlDeviceBit(0);
 			farmControlTerminal.setFunctionName("正转");
 			farmControlTerminal.setFunctionCode("forward");
-			farmControlTerminal.setTerminalIdentifying("fertilizerCan" + i);
+			farmControlTerminal.setTerminalCode("fertilizerCan" + i);
 			insertControlTerminal(connection, farmControlTerminal);
 			FarmControlTerminal farmControlTerminal1 = new FarmControlTerminal();
 			farmControlTerminal1.setControlDeviceId(deviceId);
 			farmControlTerminal1.setControlDeviceBit(1);
 			farmControlTerminal1.setFunctionName("反转");
 			farmControlTerminal1.setFunctionCode("reverse");
-			farmControlTerminal1.setTerminalIdentifying("fertilizerCan" + i);
+			farmControlTerminal1.setTerminalCode("fertilizerCan" + i);
 			insertControlTerminal(connection, farmControlTerminal1);
 			deviceId++;
 		}
@@ -71,14 +71,14 @@ public class FarmControlTerminalTest {
 			farmControlTerminal.setControlDeviceBit(0);
 			farmControlTerminal.setFunctionName("正转");
 			farmControlTerminal.setFunctionCode("forward");
-			farmControlTerminal.setTerminalIdentifying("medicineCan" + i);
+			farmControlTerminal.setTerminalCode("medicineCan" + i);
 			insertControlTerminal(connection, farmControlTerminal);
 			FarmControlTerminal farmControlTerminal1 = new FarmControlTerminal();
 			farmControlTerminal1.setControlDeviceId(deviceId);
 			farmControlTerminal1.setControlDeviceBit(1);
 			farmControlTerminal1.setFunctionName("反转");
 			farmControlTerminal1.setFunctionCode("reverse");
-			farmControlTerminal1.setTerminalIdentifying("medicineCan" + i);
+			farmControlTerminal1.setTerminalCode("medicineCan" + i);
 			insertControlTerminal(connection, farmControlTerminal1);
 			deviceId++;
 		}
@@ -92,14 +92,14 @@ public class FarmControlTerminalTest {
 			farmControlTerminal.setControlDeviceBit(0);
 			farmControlTerminal.setFunctionName("正转");
 			farmControlTerminal.setFunctionCode("forward");
-			farmControlTerminal.setTerminalIdentifying("districtNum" + i);
+			farmControlTerminal.setTerminalCode("districtNum" + i);
 			insertControlTerminal(connection, farmControlTerminal);
 			FarmControlTerminal farmControlTerminal1 = new FarmControlTerminal();
 			farmControlTerminal1.setControlDeviceId(deviceId);
 			farmControlTerminal1.setControlDeviceBit(1);
 			farmControlTerminal1.setFunctionName("反转");
 			farmControlTerminal1.setFunctionCode("reverse");
-			farmControlTerminal1.setTerminalIdentifying("districtNum" + i);
+			farmControlTerminal1.setTerminalCode("districtNum" + i);
 			insertControlTerminal(connection, farmControlTerminal1);
 			deviceId++;
 		}
@@ -133,7 +133,7 @@ public class FarmControlTerminalTest {
 			preparedStatement.setInt(2, farmControlTerminal.getControlDeviceBit());
 			preparedStatement.setString(3, farmControlTerminal.getFunctionName());
 			preparedStatement.setString(4, farmControlTerminal.getFunctionCode());
-			preparedStatement.setString(5, farmControlTerminal.getTerminalIdentifying());
+			preparedStatement.setString(5, farmControlTerminal.getTerminalCode());
 			preparedStatement.execute();
 		} catch (Exception e) {
 			// TODO: handle exception

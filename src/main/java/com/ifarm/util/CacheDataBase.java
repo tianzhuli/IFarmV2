@@ -72,6 +72,7 @@ public class CacheDataBase {
 	public static Map<String, String> collectorDeviceUnit = new HashMap<String, String>(); // 采集设备的参数对应的单位
 	public static Map<Long, Long> collectorLastCommandTimeMap = new ConcurrentHashMap<>(); // 采集设备上次指令下方时间
 	public static Map<String, Object> systemConfigCacheMap = new ConcurrentHashMap<String, Object>(); // 系统配置缓存
+	public static Map<String, Object> farmConfigCacheMap = new ConcurrentHashMap<String, Object>(); // 配置缓存
 	public static Map<Long, ChannelHandlerContext> channelHandlerContextMap = new ConcurrentHashMap<>();
 	/**
 	 * 初始化的data
@@ -333,7 +334,47 @@ public class CacheDataBase {
 			// TODO: handle exception
 			e.printStackTrace();
 		} finally {
-			LOGGER.info("topics:" + topicThemeMap);
+			LOGGER.info("systemConfigCacheMap:" + systemConfigCacheMap);
+			preparedStatement.close();
+			resultSet.close();
+		}
+
+	}
+	
+	public static void loadFarmConfigCache(Connection con)
+			throws SQLException {
+		farmConfigCacheMap.clear();
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
+		try {
+			StringBuffer stringBuffer = new StringBuffer(
+					"select * from  farm_config");
+			preparedStatement = con.prepareStatement(stringBuffer.toString());
+			resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				String configKey = resultSet.getString(2);
+				String configValue = resultSet.getString(3);
+				String configType = resultSet.getString(4);
+				if (StringUtil.equals("String", configType)) {
+					farmConfigCacheMap.put(configKey, configKey);
+				} else if (StringUtil.equals("Integer", configType)) {
+					farmConfigCacheMap.put(configKey,
+							Integer.valueOf(configValue));
+				} else if (StringUtil.equals("Boolean", configType)) {
+					farmConfigCacheMap.put(configKey,
+							Boolean.valueOf(configValue));
+				} else if (StringUtil.equals("JSONObject", configType)) {
+					farmConfigCacheMap.put(configKey,
+							JSONObject.parse(configValue));
+				} else {
+					farmConfigCacheMap.put(configKey, JSONObject.parseObject(configValue,Class.forName(configType)));
+				}
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		} finally {
+			LOGGER.info("farmConfigCacheMap:" + farmConfigCacheMap);
 			preparedStatement.close();
 			resultSet.close();
 		}
@@ -398,6 +439,7 @@ public class CacheDataBase {
 		loadProperties();
 		loadTopics(con);
 		loadSystemConfigCache(con);
+		loadFarmConfigCache(con);
 		con.close();
 		loadInitBaseConfig();
 		// CacheDataBase.initRedisDao.redisConnect();

@@ -49,9 +49,9 @@ public class MultiControlTask implements Serializable {
 	private String controlOperation; // 控制的具体操作，比如开或者关
 	private String functionName; // 操作的名称
 	@Validator
-	private String canNo; // 选罐(1,2)
+	private String canNo; // 选罐(1,2),施药和施肥的特殊场景
 	private String controlArea = "1"; // 控制区域,1、2、3、4、5
-	private String unitNode = "1";
+	private String unitNodeInfo; // JSONObject,{"functionCode":2} 
 	@Transient
 	private Integer level; // 命令等级（手动停止为4最高等级，其次为自动停止、往下以此为立即执行和定时执行）
 	@Validator
@@ -314,12 +314,13 @@ public class MultiControlTask implements Serializable {
 		this.faultIndentifying = faultIndentifying;
 	}
 
-	public String getUnitNode() {
-		return unitNode;
+
+	public String getUnitNodeInfo() {
+		return unitNodeInfo;
 	}
 
-	public void setUnitNode(String unitNode) {
-		this.unitNode = unitNode;
+	public void setUnitNodeInfo(String unitNodeInfo) {
+		this.unitNodeInfo = unitNodeInfo;
 	}
 
 	/***

@@ -76,18 +76,5 @@
 		"humidityControl" : ["nodeNum"],
 		"oxygenControl" : ["nodeNum"]
 	},
-	"swithMultiControlTask": ["waterRollerShutterControl", "temperatureControl", "humidityControl"],
-	"controlUnitTerminalIdentifying": {
-	    "carbonDioxideControl": [""],
-		"draughtFanControl": [""],
-		"fillLightControl": [""],
-		"sideRollerShutterControl": [""],
-		"sunshadeControl": [""],
-		"topRollerShutterControl": [""],
-		"valveControl": [""],
-		"waterRollerShutterControl": ["pump", "fertilizerCan", "medicineCan"],
-		"temperatureControl": ["rise","fall"],
-		"humidityControl" : ["humidity"],
-		"oxygenControl" : [""]
-	}
+	"swithMultiControlTask": ["waterRollerShutterControl", "temperatureControl", "humidityControl"]
 }
