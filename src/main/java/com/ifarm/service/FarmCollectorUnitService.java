@@ -8,9 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ifarm.bean.FarmControlUnit;
-import com.ifarm.dao.FarmControlUnitDao;
-import com.ifarm.enums.ControlSystemEnum;
+import com.ifarm.bean.FarmCollectorUnit;
+import com.ifarm.dao.FarmCollectorUnitDao;
 import com.ifarm.enums.ServiceHeadEnum;
 import com.ifarm.enums.SystemReturnCodeEnum;
 import com.ifarm.util.JsonObjectUtil;
@@ -18,45 +17,37 @@ import com.ifarm.util.SystemResultEncapsulation;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 @Service
-public class FarmControlUnitService extends
-		AbstractFarmService<FarmControlUnitDao, FarmControlUnit> {
+public class FarmCollectorUnitService extends
+		AbstractFarmService<FarmCollectorUnitDao, FarmCollectorUnit> {
 
 	@Autowired
-	private FarmControlUnitDao farmControlUnitDao;
+	private FarmCollectorUnitDao farmCollectorUnitDao;
 
-	public String saveControlUnit(FarmControlUnit farmControlUnit) {
-		ControlSystemEnum systemEnum = ControlSystemEnum
-				.getValueByCode(farmControlUnit.getSystemCode());
-		if (systemEnum == null) {
-			return SystemResultEncapsulation
-					.fillResultCode(SystemReturnCodeEnum.PARAM_ERROR);
-		}
-		farmControlUnit.setSystemType(systemEnum.getType());
-		validator(farmControlUnit);
+	public String saveCollectorUnit(FarmCollectorUnit farmCollectorUnit) {
+		validator(farmCollectorUnit);
 		// 唯一性校验
-		FarmControlUnit existUnit = new FarmControlUnit();
-		existUnit.setFarmId(farmControlUnit.getFarmId());
-		existUnit.setSystemCode(farmControlUnit.getSystemCode());
-		existUnit.setUnitDistrict(farmControlUnit.getUnitDistrict());
-		existUnit.setUnitPosition(farmControlUnit.getUnitPosition());
-		List<FarmControlUnit> farmControlUnits = farmControlUnitDao
+		FarmCollectorUnit existUnit = new FarmCollectorUnit();
+		existUnit.setFarmId(farmCollectorUnit.getFarmId());
+		existUnit.setUnitDistrict(farmCollectorUnit.getUnitDistrict());
+		existUnit.setUnitPosition(farmCollectorUnit.getUnitPosition());
+		List<FarmCollectorUnit> farmControlUnits = farmCollectorUnitDao
 				.getDynamicList(existUnit);
 		if (farmControlUnits.size() > 0) {
 			return SystemResultEncapsulation
 					.fillResultCode(SystemReturnCodeEnum.UNIQUE_ERROR);
 		}
-		return super.baseSave(farmControlUnit);
+		return super.baseSave(farmCollectorUnit);
 	}
 
 	/**
-	 * 控制单元的区域和位置
+	 * 采集单元的区域和位置
 	 * 
 	 * @param farmId
 	 * @return
 	 */
 	public String controlUnitRegion(String farmId) {
 		JSONObject jsonObject = new JSONObject();
-		List list = farmControlUnitDao.controlUnitRegion(farmId);
+		List list = farmCollectorUnitDao.collectorUnitRegion(farmId);
 		if (list == null || list.size() == 0) {
 			return jsonObject.toJSONString();
 		}
@@ -77,7 +68,7 @@ public class FarmControlUnitService extends
 	}
 
 	/**
-	 * 区域位置的控制单元
+	 * 区域位置的采集单元
 	 * 
 	 * @param farmId
 	 * @param unitDistrict
@@ -85,9 +76,9 @@ public class FarmControlUnitService extends
 	 * @return
 	 */
 	public String regionControlUnit(String farmId, String unitDistrict,
-			String unitLocation, String systemCode) {
-		List list = farmControlUnitDao.regionControlUnit(farmId, unitDistrict,
-				unitLocation, systemCode);
+			String unitLocation) {
+		List list = farmCollectorUnitDao.regionCollectorUnit(farmId, unitDistrict,
+				unitLocation);
 		JSONArray jsonArray = new JSONArray();
 		for (int i = 0; i < list.size(); i++) {
 			Object[] objects = (Object[]) list.get(i);
@@ -99,20 +90,11 @@ public class FarmControlUnitService extends
 			if (objects[objects.length - 1] != null) {
 				extJsonObject = JSONObject.parseObject(String
 						.valueOf(objects[objects.length - 1]));
-			}
-			itemArray.add(extJsonObject);
-			ControlSystemEnum systemEnum = ControlSystemEnum
-					.getValueByCode(String.valueOf(objects[3]));
-			if (systemEnum != null) {
-				itemArray.add(systemEnum.getShortName());
-				itemArray.add(systemEnum.getType());
-			} else {
-				itemArray.add("其他");
-				itemArray.add("Control");
+				itemArray.add(extJsonObject);
 			}
 			jsonArray.add(itemArray);
 		}
 		return JsonObjectUtil.buildCommandJsonObject(jsonArray,
-				ServiceHeadEnum.REGION_CONTROL_UNIT).toJSONString();
+				ServiceHeadEnum.REGION_COLLECTOR_UNIT).toJSONString();
 	}
 }

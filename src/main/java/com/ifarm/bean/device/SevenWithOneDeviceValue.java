@@ -143,7 +143,7 @@ public class SevenWithOneDeviceValue extends DeviceValueBase {
 	}
 
 	@Override
-	public DeviceValueType getDeviceValueTyle() {
+	public DeviceValueType getDeviceValueType() {
 		// TODO Auto-generated method stub
 		return DeviceValueType.SEVEN_WITH_ONE;
 	}

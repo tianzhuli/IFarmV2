@@ -18,25 +18,54 @@ public class CollectorDeviceValueRedisUtil {
 	@Qualifier("redisTemplate")
 	private RedisTemplate<String, DeviceValueBase> valueRedisTemplate;
 
-	public void saveCollectorDeviceValue(Integer farmId, Long collectorDeviceId, DeviceValueBase deviceValueBase) {
-		HashOperations<String, Long, DeviceValueBase> hashOperations = valueRedisTemplate.opsForHash();
-		hashOperations.put(RedisContstant.FARM_COLLECTOR_DEVICE_MAIN_VALUE + farmId.toString(), collectorDeviceId, deviceValueBase);
+	public void saveCollectorDeviceValueByFarm(Integer farmId,
+			Long collectorDeviceId, DeviceValueBase deviceValueBase) {
+		HashOperations<String, Long, DeviceValueBase> hashOperations = valueRedisTemplate
+				.opsForHash();
+		hashOperations.put(RedisContstant.FARM_COLLECTOR_DEVICE_MAIN_VALUE
+				+ farmId.toString(), collectorDeviceId, deviceValueBase);
 	}
 
-	public DeviceValueBase getCollectorDeviceValue(Integer farmId, Long deviceId) {
-		HashOperations<String, Long, DeviceValueBase> hashOperations = valueRedisTemplate.opsForHash();
-		return hashOperations.get(RedisContstant.FARM_COLLECTOR_DEVICE_MAIN_VALUE + farmId.toString(), deviceId);
+	public void saveCollectorDeviceValueByUnit(Integer unitNo,
+			Long collectorDeviceId, DeviceValueBase deviceValueBase) {
+		HashOperations<String, Long, DeviceValueBase> hashOperations = valueRedisTemplate
+				.opsForHash();
+		hashOperations.put(RedisContstant.FARM_COLLECTOR_DEVICE_MAIN_VALUE
+				+ unitNo.toString(), collectorDeviceId, deviceValueBase);
+	}
+
+	public DeviceValueBase getCollectorDeviceValueByFarm(Integer farmId,
+			Long deviceId) {
+		HashOperations<String, Long, DeviceValueBase> hashOperations = valueRedisTemplate
+				.opsForHash();
+		return hashOperations.get(
+				RedisContstant.FARM_COLLECTOR_DEVICE_MAIN_VALUE
+						+ farmId.toString(), deviceId);
+	}
+
+	public DeviceValueBase getCollectorDeviceValueByUnit(Integer unitNo,
+			Long deviceId) {
+		HashOperations<String, Long, DeviceValueBase> hashOperations = valueRedisTemplate
+				.opsForHash();
+		return hashOperations.get(
+				RedisContstant.FARM_COLLECTOR_DEVICE_MAIN_VALUE
+						+ unitNo.toString(), deviceId);
 	}
 
 	public List<DeviceValueBase> getCollectorDeviceCacheValue(Long deviceId) {
-		String redisKeyString = RedisContstant.FARM_COLLECTOR_DEVICE_MAIN_CACHE_VALUE + deviceId.toString();
-		ListOperations<String, DeviceValueBase> listOperations = valueRedisTemplate.opsForList();
+		String redisKeyString = RedisContstant.FARM_COLLECTOR_DEVICE_MAIN_CACHE_VALUE
+				+ deviceId.toString();
+		ListOperations<String, DeviceValueBase> listOperations = valueRedisTemplate
+				.opsForList();
 		return listOperations.range(redisKeyString, 0, CacheDataBase.cacheSize);
 	}
 
-	public void saveCollectorDeviceCacheValue(Long deviceId, DeviceValueBase deviceValueBase) {
-		String redisKeyString = RedisContstant.FARM_COLLECTOR_DEVICE_MAIN_CACHE_VALUE + deviceId.toString();
-		ListOperations<String, DeviceValueBase> listOperations = valueRedisTemplate.opsForList();
+	public void saveCollectorDeviceCacheValue(Long deviceId,
+			DeviceValueBase deviceValueBase) {
+		String redisKeyString = RedisContstant.FARM_COLLECTOR_DEVICE_MAIN_CACHE_VALUE
+				+ deviceId.toString();
+		ListOperations<String, DeviceValueBase> listOperations = valueRedisTemplate
+				.opsForList();
 		if (listOperations.size(redisKeyString) >= CacheDataBase.cacheSize) {
 			listOperations.rightPop(redisKeyString);
 		}

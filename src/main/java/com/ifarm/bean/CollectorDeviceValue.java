@@ -158,7 +158,7 @@ public class CollectorDeviceValue extends DeviceValueBase {
 	}
 
 	@Override
-	public DeviceValueType getDeviceValueTyle() {
+	public DeviceValueType getDeviceValueType() {
 		// TODO Auto-generated method stub
 		return DeviceValueType.COLLECOT_TYPE_FIVE;
 	}

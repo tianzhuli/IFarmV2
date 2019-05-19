@@ -79,7 +79,7 @@ public class Co2DeviceValue extends DeviceValueBase {
 	}
 
 	@Override
-	public DeviceValueType getDeviceValueTyle() {
+	public DeviceValueType getDeviceValueType() {
 		// TODO Auto-generated method stub
 		return DeviceValueType.CO2;
 	}

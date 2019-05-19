@@ -60,7 +60,8 @@ public class CollectorDeviceValueService {
 			collectorDeviceValueDao.saveBase(collectorDeviceValue);
 			FarmCollectorDevice farmCollectorDevice = fCollectorDeviceDao.getTById(collectorDeviceValue.getDeviceId(), FarmCollectorDevice.class);
 			if (farmCollectorDevice != null) {
-				cDeviceRedisUtil.saveCollectorDeviceValue(farmCollectorDevice.getFarmId(), collectorDeviceValue.getDeviceId(), collectorDeviceValue);
+				cDeviceRedisUtil.saveCollectorDeviceValueByFarm(farmCollectorDevice.getFarmId(), collectorDeviceValue.getDeviceId(), collectorDeviceValue);
+				cDeviceRedisUtil.saveCollectorDeviceValueByUnit(farmCollectorDevice.getUnitNo(), collectorDeviceValue.getDeviceId(), collectorDeviceValue);
 			} else {
 				LOGGER.error("{} is no exist", collectorDeviceValue);
 			}
@@ -85,13 +86,14 @@ public class CollectorDeviceValueService {
 		JSONArray collectorDeviceValueArray = new JSONArray();
 		Long deviceId = fDevice.getDeviceId();
 		Integer farmId = fDevice.getFarmId();
+		Integer unitNo = fDevice.getUnitNo();
 		try {
 			if (deviceId != null) {
 				FarmCollectorDevice farmCollectorDevice = fCollectorDeviceDao.getTById(deviceId, FarmCollectorDevice.class);
 				if (farmCollectorDevice == null) {
 					return collectorDeviceValueArray;
 				}
-				DeviceValueBase deviceValue = collectorDeviceValueRedisUtil.getCollectorDeviceValue(farmCollectorDevice.getFarmId(), deviceId);
+				DeviceValueBase deviceValue = collectorDeviceValueRedisUtil.getCollectorDeviceValueByFarm(farmCollectorDevice.getFarmId(), deviceId);
 				if (deviceValue == null) {
 					LOGGER.info("device={} is no deviceValue", farmCollectorDevice);
 					return collectorDeviceValueArray;
@@ -99,17 +101,39 @@ public class CollectorDeviceValueService {
 				JSONObject jsonObject = new JSONObject();
 				JSONArray array = new JSONArray();
 				fillCollectorDevice(array,deviceValue, deviceId, farmCollectorDevice);
-				packagingDeviceValue(jsonObject, array, deviceValue.getDeviceValueTyle());
+				packagingDeviceValue(jsonObject, array, deviceValue.getDeviceValueType());
 				collectorDeviceValueArray.add(jsonObject);
-			} else if (deviceId == null && farmId != null) {
+			} else if (deviceId == null && unitNo != null) {
 				List<FarmCollectorDevice> farmCollectorDevices = farmCollectorDeviceService.queryFarmCollectorDeviceList(fDevice);
 				Map<String, JSONArray> collectorDeviceTypeMap = new HashMap<String, JSONArray>();
 				for (int i = 0; i < farmCollectorDevices.size(); i++) {
 					FarmCollectorDevice farmCollectorDevice = farmCollectorDevices.get(i);
 					Long newDeviceId = farmCollectorDevice.getDeviceId();
-					DeviceValueBase deviceValueBase = collectorDeviceValueRedisUtil.getCollectorDeviceValue(farmId, newDeviceId);
+					DeviceValueBase deviceValueBase = collectorDeviceValueRedisUtil.getCollectorDeviceValueByUnit(unitNo, newDeviceId);
 					if (deviceValueBase != null) {
-						String deviceValueType = deviceValueBase.getDeviceValueTyle().getCode();
+						String deviceValueType = deviceValueBase.getDeviceValueType().getCode();
+						if (!collectorDeviceTypeMap.containsKey(deviceValueType)) {
+							collectorDeviceTypeMap.put(deviceValueType, new JSONArray());
+						}
+						fillCollectorDevice(collectorDeviceTypeMap.get(deviceValueType), deviceValueBase, newDeviceId, farmCollectorDevice);
+					}
+				}
+				for (Entry<String, JSONArray> entry : collectorDeviceTypeMap.entrySet()) {
+					JSONObject jsonObject = new JSONObject();
+					String type = entry.getKey();
+					JSONArray dataArray = entry.getValue();
+					packagingDeviceValue(jsonObject, dataArray, DeviceValueType.getValueTypeByCode(type));
+					collectorDeviceValueArray.add(jsonObject);
+				}
+			} else if (unitNo == null && farmId != null) {
+				List<FarmCollectorDevice> farmCollectorDevices = farmCollectorDeviceService.queryFarmCollectorDeviceList(fDevice);
+				Map<String, JSONArray> collectorDeviceTypeMap = new HashMap<String, JSONArray>();
+				for (int i = 0; i < farmCollectorDevices.size(); i++) {
+					FarmCollectorDevice farmCollectorDevice = farmCollectorDevices.get(i);
+					Long newDeviceId = farmCollectorDevice.getDeviceId();
+					DeviceValueBase deviceValueBase = collectorDeviceValueRedisUtil.getCollectorDeviceValueByFarm(farmId, newDeviceId);
+					if (deviceValueBase != null) {
+						String deviceValueType = deviceValueBase.getDeviceValueType().getCode();
 						if (!collectorDeviceTypeMap.containsKey(deviceValueType)) {
 							collectorDeviceTypeMap.put(deviceValueType, new JSONArray());
 						}
@@ -144,7 +168,7 @@ public class CollectorDeviceValueService {
 				DeviceValueType deviceType = null;
 				for (int i = 0; i < size; i++) {
 					DeviceValueBase dValue = deviceValueBases.get(i);
-					deviceType = dValue.getDeviceValueTyle();
+					deviceType = dValue.getDeviceValueType();
 					try {
 						values.add(dValue.getDynamicParamValue(paramType));
 					} catch (Exception e) {
@@ -204,7 +228,7 @@ public class CollectorDeviceValueService {
 					if (farmCollectorDevice == null || (deviceDistrict != null && !farmCollectorDevice.getDeviceDistrict().equals(deviceDistrict))) {
 						continue;
 					}
-					JSONObject deviceValueJsonObject = JsonObjectUtil.fromBean(collectorDeviceValueRedisUtil.getCollectorDeviceValue(
+					JSONObject deviceValueJsonObject = JsonObjectUtil.fromBean(collectorDeviceValueRedisUtil.getCollectorDeviceValueByFarm(
 							farmCollectorDevice.getFarmId(), deviceNo));
 					if (deviceValueJsonObject == null) {
 						deviceValueJsonObject = new JSONObject();

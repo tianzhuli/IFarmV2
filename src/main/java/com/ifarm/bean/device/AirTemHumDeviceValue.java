@@ -101,7 +101,7 @@ public class AirTemHumDeviceValue extends DeviceValueBase {
 	}
 
 	@Override
-	public DeviceValueType getDeviceValueTyle() {
+	public DeviceValueType getDeviceValueType() {
 		// TODO Auto-generated method stub
 		return DeviceValueType.Air_TEMHUM;
 	}

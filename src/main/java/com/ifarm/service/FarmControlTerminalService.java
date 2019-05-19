@@ -81,7 +81,7 @@ public class FarmControlTerminalService extends
 		resultJsonObject.put("operations", jsonArray);
 		resultJsonObject.put("isEnableMultiFunction", BaseIfarmUtil
 				.isEnableMultiFunction(farmControlUnit.getSystemType()));
-		return jsonArray.toString();
+		return resultJsonObject.toString();
 	}
 
 	public String saveFarmControlTerminal(

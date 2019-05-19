@@ -91,7 +91,7 @@ public class SoilTemHumDeviceValue extends DeviceValueBase {
 	}
 
 	@Override
-	public DeviceValueType getDeviceValueTyle() {
+	public DeviceValueType getDeviceValueType() {
 		// TODO Auto-generated method stub
 		return DeviceValueType.SOIL_TEMHUM;
 	}

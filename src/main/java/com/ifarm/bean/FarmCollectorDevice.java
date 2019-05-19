@@ -6,6 +6,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.ifarm.annotation.Validator;
+
 @Entity
 @Table(name = "farm_collector_device")
 public class FarmCollectorDevice {
@@ -13,6 +15,7 @@ public class FarmCollectorDevice {
 	private Long deviceId;
 	private Integer farmId;
 	private Long collectorId;
+	@Validator
 	private Integer unitNo;
 	private Integer deviceOrderNo;
 	private String deviceVersion;

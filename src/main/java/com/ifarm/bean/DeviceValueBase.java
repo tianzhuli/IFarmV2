@@ -48,7 +48,7 @@ public abstract class DeviceValueBase implements Serializable {
 	 * 
 	 * @return
 	 */
-	public abstract DeviceValueType getDeviceValueTyle();
+	public abstract DeviceValueType getDeviceValueType();
 
 	public Double getDynamicParamValue(String paramType) throws Exception {
 		paramType = StringUtil.firstCharUpper(paramType);

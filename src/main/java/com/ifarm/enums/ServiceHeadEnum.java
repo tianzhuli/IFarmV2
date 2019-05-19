@@ -10,7 +10,13 @@ public enum ServiceHeadEnum {
 			"region_control_unit",
 			"区域控制系统",
 			"区域,位置,编号,系统编码,控制单元号,扩展信息,系统类型,控制类型",
-			"unitDistrict,unitPosition,unitId,systemCode,unitNo,unitExtInfo,systemType,controlType");
+			"unitDistrict,unitPosition,unitId,systemCode,unitNo,unitExtInfo,systemType,controlType"),
+	REGION_COLLECTOR_UNIT(
+			"region_collector_unit",
+			"区域控制系统",
+			"区域,位置,编号,控制单元号,扩展信息",
+			"unitDistrict,unitPosition,unitId,unitNo,unitExtInfo"),
+			;
 	private String code;
 	private String ChineseName;
 	private String param;

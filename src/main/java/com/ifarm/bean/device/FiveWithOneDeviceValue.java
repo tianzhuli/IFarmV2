@@ -128,7 +128,7 @@ public class FiveWithOneDeviceValue extends DeviceValueBase {
 	}
 
 	@Override
-	public DeviceValueType getDeviceValueTyle() {
+	public DeviceValueType getDeviceValueType() {
 		// TODO Auto-generated method stub
 		return DeviceValueType.FIVE_WITH_ONE;
 	}
