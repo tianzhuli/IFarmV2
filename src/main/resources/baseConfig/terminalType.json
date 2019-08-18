@@ -18,17 +18,16 @@
 			"functionName": "紫外线",
 			"functionCode": "ultraviolet"
 		}],
-		"sideRollerShutterControl": [{
-			"functionName": "开",
-			"functionCode": "enable"
-		}],
 		"sunshadeControl": [{
 			"functionName": "开",
 			"functionCode": "enable"
 		}],
-		"topRollerShutterControl": [{
-			"functionName": "开",
-			"functionCode": "enable"
+		"rollerShutterControl": [{
+			"functionName": "顶卷帘",
+			"functionCode": "top"
+		},{
+			"functionName": "侧卷帘",
+			"functionCode": "side"
 		}],
 		"valveControl": [{
 			"functionName": "开",

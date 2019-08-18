@@ -4,15 +4,19 @@ import java.io.File;
 import java.util.UUID;
 
 public class FileUtil {
+
+	public static final String COMMON_FILE_PREFIX = "ifarm_file";
+
+	public static final String COMMON_CHAR = "_";
 	/**
-	 * 生成UUID码
+	 * 生成特点的文件格式
 	 * 
 	 * @param filename
 	 * @return
 	 */
-	public static String makeFileName(String filename) {
+	public static String makeFileName(String filename, String type) {
 		// 为防止文件覆盖的现象发生，要为上传文件产生一个唯一的文件名
-		return UUID.randomUUID().toString() + "_" + filename;
+		return COMMON_FILE_PREFIX + COMMON_CHAR + type + COMMON_CHAR + filename;
 	}
 
 	/**

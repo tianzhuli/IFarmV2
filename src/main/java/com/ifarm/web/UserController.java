@@ -84,7 +84,7 @@ public class UserController{
 	@RequestMapping(value = "uploadImage")
 	public String uploadImage(@RequestParam("flag") Integer flag, HttpServletRequest request, HttpServletResponse response, User user) {
 		CommonsMultipartResolver resolver = new CommonsMultipartResolver(request.getSession().getServletContext());
-		String savePath = request.getServletContext().getRealPath("/images/users");
+		String savePath = request.getServletContext().getRealPath("../../images/users");
 		if (resolver.isMultipart(request)) {
 			// 将request变成多部分request
 			MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
@@ -95,7 +95,7 @@ public class UserController{
 				MultipartFile file = multiRequest.getFile(iter.next().toString());
 				if (file != null) {
 					String fileName = file.getOriginalFilename();
-					String fileRealName = FileUtil.makeFileName(fileName);
+					String fileRealName = FileUtil.makeFileName(fileName, "user");
 					String path = FileUtil.makeRealPath(savePath, fileRealName, user.getUserId());
 					USER_CONTROLLER_LOG.info("图片上传存的路径：" + path);
 					// 上传

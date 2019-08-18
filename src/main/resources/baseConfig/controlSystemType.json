@@ -9,8 +9,8 @@
 		"systemTypeCode": "carbonDioxideControl"
 	}, {
 		"systemCode": "rollerShutters",
-		"systemType": "侧卷帘系统",
-		"systemTypeCode": "sideRollerShuttersControl"
+		"systemType": "卷帘系统",
+		"systemTypeCode": "rollerShuttersControl"
 	}, {
 		"systemCode": "waterRollerShutters",
 		"systemType": "水帘控制系统",
@@ -23,10 +23,6 @@
 		"systemCode": "oxygen",
 		"systemType": "氧气控制系统",
 		"systemTypeCode": "oxygenControl"
-	}, {
-		"systemCode": "rollerShutters",
-		"systemType": "顶卷帘系统",
-		"systemTypeCode": "topRollerShuttersControl"
 	}, {
 		"systemCode": "temperature",
 		"systemType": "温度控制系统",

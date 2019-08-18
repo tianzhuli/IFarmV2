@@ -14,6 +14,7 @@ public class FarmControlDevice {
 	@Id
 	private Integer controlDeviceId;
 	private Long collectorId;
+	private Integer collectorSerialNo;
 	private String deviceType;
 	@LikeField
 	private String deviceLocation;
@@ -35,6 +36,14 @@ public class FarmControlDevice {
 
 	public void setCollectorId(Long collectorId) {
 		this.collectorId = collectorId;
+	}
+
+	public Integer getCollectorSerialNo() {
+		return collectorSerialNo;
+	}
+
+	public void setCollectorSerialNo(Integer collectorSerialNo) {
+		this.collectorSerialNo = collectorSerialNo;
 	}
 
 	public String getDeviceType() {

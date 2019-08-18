@@ -15,6 +15,7 @@ public class FarmCollectorDevice {
 	private Long deviceId;
 	private Integer farmId;
 	private Long collectorId;
+	private Integer collectorSerialNo;
 	@Validator
 	private Integer unitNo;
 	private Integer deviceOrderNo;
@@ -38,6 +39,15 @@ public class FarmCollectorDevice {
 	public Long getCollectorId() {
 		return collectorId;
 	}
+
+	public Integer getCollectorSerialNo() {
+		return collectorSerialNo;
+	}
+
+	public void setCollectorSerialNo(Integer collectorSerialNo) {
+		this.collectorSerialNo = collectorSerialNo;
+	}
+
 	public void setCollectorId(Long collectorId) {
 		this.collectorId = collectorId;
 	}

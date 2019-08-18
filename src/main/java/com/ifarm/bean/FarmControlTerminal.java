@@ -21,6 +21,10 @@ public class FarmControlTerminal {
 	@Validator
 	private Integer unitId;
 	@Validator
+	private Long collectorId;
+	@Validator
+	private Integer collectorBit;
+	@Validator
 	private Integer controlDeviceBit;
 	@Validator
 	private String controlType;
@@ -75,6 +79,22 @@ public class FarmControlTerminal {
 
 	public Integer getUnitId() {
 		return unitId;
+	}
+
+	public Long getCollectorId() {
+		return collectorId;
+	}
+
+	public void setCollectorId(Long collectorId) {
+		this.collectorId = collectorId;
+	}
+
+	public Integer getCollectorBit() {
+		return collectorBit;
+	}
+
+	public void setCollectorBit(Integer collectorBit) {
+		this.collectorBit = collectorBit;
 	}
 
 	public void setUnitId(Integer unitId) {

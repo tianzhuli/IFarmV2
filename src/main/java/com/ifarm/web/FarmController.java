@@ -83,7 +83,6 @@ public class FarmController {
 	 * @param request
 	 * @param response
 	 * @param farm
-	 * @param flag两种标准
 	 *            ，添加农场时图片添加为1,已经有农场了更新图片为2,添加农场时无图片为0
 	 */
 
@@ -94,7 +93,7 @@ public class FarmController {
 			return farmService.saveFarm(farm);
 		} else {
 			CommonsMultipartResolver resolver = new CommonsMultipartResolver(request.getSession().getServletContext());
-			String savePath = request.getServletContext().getRealPath("/images/farms");
+			String savePath = request.getServletContext().getRealPath("../../images/farms");
 			if (resolver.isMultipart(request)) {
 				// 将request变成多部分request
 				MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
@@ -105,7 +104,7 @@ public class FarmController {
 					MultipartFile file = multiRequest.getFile(iter.next().toString());
 					if (file != null) {
 						String fileName = file.getOriginalFilename();
-						String fileRealName = FileUtil.makeFileName(fileName);
+						String fileRealName = FileUtil.makeFileName(fileName, "farm");
 						String path = FileUtil.makeRealPath(savePath, fileRealName, userId);
 						// 上传
 						try {
